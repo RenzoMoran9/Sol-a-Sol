@@ -1,6 +1,6 @@
 # Sol a Sol
 
-App minimalista de finanzas personales: lo libre del mes, gastos fijos, cierre del día con racha y fondo de emergencia. Se instala en el celular.
+App minimalista de finanzas personales: lo libre del mes, gastos fijos con pago parcial, cierre del día con racha, plan de ahorro por mes, metas a largo plazo, plan para salir de deudas (Avalancha, Bola de nieve o Solo mínimos) y un asesor con recomendaciones según tus números. Se instala en el celular.
 
 **App:** https://renzomoran9.github.io/Sol-a-Sol/
 

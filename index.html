@@ -173,7 +173,7 @@ textarea.input { min-height: 90px; resize: vertical; font-family: var(--mono); f
 
 /* Barra inferior */
 .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding: 6px max(16px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
-.tabs div { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabs div { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
 .tabs button { border: 0; background: transparent; display: grid; justify-items: center; gap: 2px; padding: 6px 0; font-size: 12px; font-weight: 600; color: var(--muted); }
 .tabs button svg { width: 22px; height: 22px; }
 .tabs button[aria-current="page"] { color: var(--ink); }
@@ -186,7 +186,8 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-width: 520px; margin: 0 auto; background: var(--surface); color: var(--ink); border-radius: 22px 22px 0 0; padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 16px; max-height: 92%; overflow-y: auto; }
 .sheet-head { display: flex; justify-content: space-between; align-items: center; }
 .sheet-head h2 { margin: 0; font: 700 20px/1 var(--display); }
-.seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg button { flex: 1 1 0; }
 .seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 0; font-weight: 600; color: var(--muted); }
 .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
 .amount-input { position: relative; }
@@ -218,7 +219,40 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 .status.ok { color: var(--good); }
 .status.warn { color: var(--warn); }
 
-.toast { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; z-index: 20; white-space: nowrap; }
+/* Plan: asesor, metas y deudas */
+.plan-title { margin: 0; font: 700 clamp(26px, 7vw, 32px)/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.tip-body { display: grid; gap: 2px; min-width: 0; }
+.tip-body b { font-weight: 700; }
+.tip-body p { color: var(--muted); }
+.tip-body p b { color: var(--ink); font-weight: 600; }
+.link { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; font-size: 13px; justify-self: start; text-decoration: underline; text-underline-offset: 3px; }
+.row .meta .link { margin-left: 4px; }
+.hint { margin: -6px 0 0; font-size: 13px; color: var(--muted); }
+.quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -4px; }
+.items { display: grid; gap: 10px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: grid; gap: 8px; }
+.item-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.item-head b { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.item .meter { height: 6px; border-radius: 3px; }
+.item .meter i { background: var(--accent); }
+.item .meta { margin: 0; font-size: 13px; color: var(--muted); }
+.item .meta b { color: var(--ink); font-weight: 600; }
+.item.done { opacity: 0.6; }
+.strategies { display: grid; gap: 8px; }
+.strategy { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 4px; }
+.strategy[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.strategy b { font: 700 16px/1.2 var(--display); }
+.strategy > span { font-size: 13px; color: var(--muted); }
+.strategy .stats { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 2px; margin-left: 6px; }
+.pct { position: relative; }
+.pct::after { content: "%"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.pct .input { padding-right: 30px; }
+.ed-fields { display: grid; gap: 14px; }
+.toast button { border: 0; background: none; padding: 0; color: var(--accent-soft); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; z-index: 20; white-space: nowrap; display: flex; align-items: center; gap: 14px; }
+.toast[hidden] { display: none !important; }
 
 @media (prefers-reduced-motion: no-preference) {
   .stack i, .meter i { transition: width 0.35s ease; }
@@ -240,6 +274,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 <main class="wrap">
   <section id="view-inicio" data-view="inicio"></section>
   <section id="view-hoy" data-view="hoy" hidden></section>
+  <section id="view-plan" data-view="plan" hidden></section>
   <section id="view-movimientos" data-view="movimientos" hidden></section>
   <section id="view-ajustes" data-view="ajustes" hidden></section>
 </main>
@@ -256,9 +291,13 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
       Hoy
     </button>
+    <button data-tab="plan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/></svg>
+      Plan
+    </button>
     <button data-tab="movimientos">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9"/></svg>
-      Movimientos
+      Historial
     </button>
     <button data-tab="ajustes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
@@ -277,14 +316,17 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       <button type="button" data-tipo="gasto" aria-pressed="true">Gasto</button>
       <button type="button" data-tipo="ingreso" aria-pressed="false">Ingreso</button>
       <button type="button" data-tipo="ahorro" aria-pressed="false">Ahorro</button>
+      <button type="button" data-tipo="deuda" aria-pressed="false" hidden>Deuda</button>
     </div>
     <div class="amount-input">
       <span>S/</span>
       <input id="movMonto" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Monto" />
     </div>
+    <p class="hint" id="movHint" hidden></p>
+    <div class="quick" id="movQuick" hidden></div>
     <p class="error" id="movError" hidden>Escribe un monto mayor a cero.</p>
     <div class="field" id="catField">
-      <span class="label">¿En qué?</span>
+      <span class="label" id="catLabel">¿En qué?</span>
       <div class="chips" id="movCats"></div>
     </div>
     <div class="two">
@@ -301,6 +343,19 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
   </form>
 </dialog>
 
+<dialog id="editor" aria-labelledby="edTitle">
+  <form class="sheet" id="edForm" novalidate>
+    <div class="sheet-head">
+      <h2 id="edTitle">Meta</h2>
+      <button type="button" class="pill" id="edClose">Cerrar</button>
+    </div>
+    <div class="ed-fields" id="edFields"></div>
+    <p class="error" id="edError" hidden></p>
+    <button class="btn accent block" type="submit">Guardar</button>
+    <button class="pill danger" type="button" id="edDelete" hidden>Eliminar</button>
+  </form>
+</dialog>
+
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
@@ -313,13 +368,15 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     { id: "imprevistos", nombre: "Imprevistos" },
     { id: "otros", nombre: "Otros" }
   ];
+  const ESTRATEGIAS = {
+    avalancha: { nombre: "Avalancha", corto: "Primero la de mayor interés", texto: "Pagas el mínimo en todas y todo lo que sobra va a la deuda con la TEA más alta. Es la que menos intereses te cobra en total." },
+    bola: { nombre: "Bola de nieve", corto: "Primero la de menor saldo", texto: "Pagas el mínimo en todas y todo lo que sobra va a la deuda más pequeña. Cierras deudas más rápido y eso te motiva a seguir." },
+    minimos: { nombre: "Solo mínimos", corto: "Solo la cuota mínima", texto: "Pagas únicamente la cuota mínima de cada deuda. Úsala solo como referencia: es la forma más lenta y la más cara." }
+  };
+  const NIVEL = { bad: "var(--bad)", warn: "var(--warn)", good: "var(--good)", info: "var(--accent)" };
 
   // Datos iniciales: vacíos en el código público. Los datos personales llegan con el link #importar=…
   const DEFAULT_SEED = window.SOLASOL_SEED || { ingresoBase: 0, fijos: [], metaFondo: 0, ahorroMensual: 0 };
-
-  // Llave pública para las notificaciones (la privada vive como secreto en GitHub).
-  const VAPID_PUBLIC = "BEwX7EESkmP3TXC7THZ8xIxZaopBEo3n4N_y-p8T74UsLOw52w917NFBP7uPbT2x5eCuhWjaKjKkdvZMhhjGukE";
-  const SECRETS_URL = "https://github.com/RenzoMoran9/Sol-a-Sol/settings/secrets/actions";
 
   const fmtInt = new Intl.NumberFormat("es-PE", { maximumFractionDigits: 0 });
   const fmtDec = new Intl.NumberFormat("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -330,18 +387,42 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
   const pad = (n) => String(n).padStart(2, "0");
   const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
   const monthKeyOf = (iso) => iso.slice(0, 7);
+  const thisMonth = () => monthKeyOf(todayISO());
   const parseAmount = (s) => { const n = parseFloat(String(s).replace(/\s/g, "").replace(",", ".")); return Number.isFinite(n) ? n : 0; };
+  const round2 = (n) => Math.round(n * 100) / 100;
+  // En los campos de monto, 0 se muestra vacío para no tener que borrarlo al escribir.
+  const numVal = (n) => (n ? String(round2(n)) : "");
+
+  function fondoDesde(metaFondo) {
+    return metaFondo > 0 ? [{ id: "fondo", nombre: "Fondo de emergencia", objetivo: metaFondo, fecha: "", base: 0 }] : [];
+  }
 
   function seed() {
     return {
       version: 1,
       ingresoBase: DEFAULT_SEED.ingresoBase || 0,
       fijos: (DEFAULT_SEED.fijos || []).map((f) => ({ ...f })),
-      metaFondo: DEFAULT_SEED.metaFondo || 0,
       ahorroMensual: DEFAULT_SEED.ahorroMensual || 0,
+      metas: fondoDesde(DEFAULT_SEED.metaFondo || 0),
+      deudas: [],
+      deudaPresupuesto: 0,
+      estrategia: "avalancha",
       meses: {},
       cierres: {}
     };
+  }
+
+  // Completa los campos nuevos en datos guardados por versiones anteriores de la app.
+  function migrate(d) {
+    d.cierres = d.cierres || {};
+    if (!Array.isArray(d.metas)) d.metas = fondoDesde(Number(d.metaFondo) || 0);
+    delete d.metaFondo;
+    delete d.push;
+    if (!Array.isArray(d.deudas)) d.deudas = [];
+    d.deudaPresupuesto = Number(d.deudaPresupuesto) || 0;
+    if (!ESTRATEGIAS[d.estrategia]) d.estrategia = "avalancha";
+    d.ahorroMensual = Number(d.ahorroMensual) || 0;
+    return d;
   }
 
   function load() {
@@ -349,7 +430,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const data = JSON.parse(raw);
-        if (data && data.version === 1 && Array.isArray(data.fijos)) { data.cierres = data.cierres || {}; return data; }
+        if (data && data.version === 1 && Array.isArray(data.fijos)) return migrate(data);
       }
     } catch (e) { /* almacenamiento no disponible: se usa la semilla en memoria */ }
     return seed();
@@ -360,7 +441,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
   }
 
   let state = load();
-  let current = monthKeyOf(todayISO());
+  let current = thisMonth();
   let view = "inicio";
   let pendingToast = "";
 
@@ -378,7 +459,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       else if (Array.isArray(cfg.fijos)) {
         state.ingresoBase = Number(cfg.ingresoBase) || 0;
         state.fijos = cfg.fijos.map((f) => ({ id: String(f.id), nombre: String(f.nombre), monto: Number(f.monto) || 0 }));
-        state.metaFondo = Number(cfg.metaFondo) || 0;
+        state.metas = fondoDesde(Number(cfg.metaFondo) || 0);
         state.ahorroMensual = Number(cfg.ahorroMensual) || 0;
         state.meses = {};
         save();
@@ -390,6 +471,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 
   if (/[?&]cierre=1/.test(location.search) || location.hash === "#hoy") view = "hoy";
 
+  /* ---------- Meses ---------- */
   function getMonth(key, create) {
     if (!state.meses[key] && create) {
       state.meses[key] = {
@@ -406,13 +488,133 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     return getMonth(key, false) || { ingreso: state.ingresoBase, presupuesto: state.fijos.map((f) => ({ ...f })), movs: [], virtual: true };
   }
 
-  function summary(m) {
+  function monthName(key, withYear = true) {
+    const [y, mo] = key.split("-").map(Number);
+    const name = new Date(y, mo - 1, 1).toLocaleDateString("es-PE", { month: "long" }).toLowerCase();
+    return withYear ? `${name} ${y}` : name;
+  }
+
+  function shiftMonth(key, delta) {
+    const [y, mo] = key.split("-").map(Number);
+    const d = new Date(y, mo - 1 + delta, 1);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  }
+
+  function monthsBetween(from, to) {
+    const [y1, m1] = from.split("-").map(Number);
+    const [y2, m2] = to.split("-").map(Number);
+    return (y2 - y1) * 12 + (m2 - m1);
+  }
+
+  function catName(m, id) {
+    const p = m.presupuesto.find((x) => x.id === id) || state.fijos.find((x) => x.id === id) || EXTRA_CATS.find((x) => x.id === id);
+    return p ? p.nombre : "Otros";
+  }
+
+  function movLabel(m, mv) {
+    if (mv.tipo === "gasto") return catName(m, mv.cat);
+    if (mv.tipo === "ingreso") return "Ingreso";
+    if (mv.tipo === "ahorro") { const meta = state.metas.find((x) => x.id === metaOf(mv)); return meta ? `Ahorro · ${meta.nombre}` : "Ahorro"; }
+    const d = state.deudas.find((x) => x.id === mv.deuda);
+    return d ? `Pago · ${d.nombre}` : "Pago de deuda";
+  }
+
+  /* ---------- Metas ---------- */
+  const defaultMetaId = () => (state.metas[0] ? state.metas[0].id : null);
+  const metaOf = (mv) => (state.metas.some((x) => x.id === mv.meta) ? mv.meta : defaultMetaId());
+
+  function ahorradoMeta(meta) {
+    let t = Number(meta.base) || 0;
+    for (const m of Object.values(state.meses)) for (const mv of m.movs) if (mv.tipo === "ahorro" && metaOf(mv) === meta.id) t += mv.monto;
+    return t;
+  }
+
+  function totalAhorrado() {
+    let t = state.metas.reduce((a, x) => a + (Number(x.base) || 0), 0);
+    for (const m of Object.values(state.meses)) for (const mv of m.movs) if (mv.tipo === "ahorro") t += mv.monto;
+    return t;
+  }
+
+  function metaInfo(meta, key) {
+    const ahorrado = ahorradoMeta(meta);
+    const faltan = Math.max(0, meta.objetivo - ahorrado);
+    let mesesRest = 0, necesario = 0, vencida = false;
+    if (meta.fecha && faltan > 0) {
+      mesesRest = monthsBetween(key, meta.fecha) + 1;
+      if (mesesRest < 1) vencida = true; else necesario = faltan / mesesRest;
+    }
+    return { ahorrado, faltan, mesesRest, necesario, vencida };
+  }
+
+  const esFondo = (meta) => meta.id === "fondo" || /emergencia/i.test(meta.nombre);
+
+  /* ---------- Deudas ---------- */
+  const minDe = (d) => Math.min(d.minimo || 0, d.saldo);
+  const sumMinimos = (list) => list.reduce((a, d) => a + minDe(d), 0);
+  const presupuestoDeudas = (list) => Math.max(state.deudaPresupuesto, sumMinimos(list));
+
+  // Saldos como estaban al empezar el mes (se suman de vuelta los pagos de este mes).
+  function deudasInicioMes() {
+    const m = monthView(thisMonth());
+    const pagado = {};
+    for (const mv of m.movs) if (mv.tipo === "deuda") pagado[mv.deuda] = (pagado[mv.deuda] || 0) + (mv.aplicado != null ? mv.aplicado : mv.monto);
+    const inicio = state.deudas.map((d) => ({ ...d, saldo: round2(d.saldo + (pagado[d.id] || 0)) })).filter((d) => d.saldo > 0.005);
+    return { inicio, pagado };
+  }
+
+  function deudaPlanMes() {
+    const { inicio } = deudasInicioMes();
+    if (!inicio.length) return 0;
+    return state.estrategia === "minimos" ? sumMinimos(inicio) : presupuestoDeudas(inicio);
+  }
+
+  // Simula mes a mes: interés mensual desde la TEA, mínimos a todas y el sobrante según la estrategia.
+  function simulate(deudas, presupuesto, estrategia) {
+    const ds = deudas.filter((d) => d.saldo > 0.005).map((d) => ({ id: d.id, saldo: d.saldo, tea: d.tea || 0, minimo: d.minimo || 0, r: Math.pow(1 + (d.tea || 0) / 100, 1 / 12) - 1 }));
+    const res = { meses: 0, intereses: 0, payoff: {}, primerMes: {}, nunca: false, primeraCerrada: 0 };
+    if (!ds.length) return res;
+    const budget = estrategia === "minimos" ? Infinity : Math.max(presupuesto, sumMinimos(ds));
+    let mes = 0;
+    while (ds.some((d) => d.saldo > 0.005) && mes < 600) {
+      mes++;
+      const act = ds.filter((d) => d.saldo > 0.005);
+      for (const d of act) { const i = d.saldo * d.r; d.saldo += i; res.intereses += i; }
+      let avail = budget;
+      const pay = {};
+      for (const d of act) { const p = Math.min(d.minimo, d.saldo, avail); d.saldo -= p; avail -= p; pay[d.id] = p; }
+      if (estrategia !== "minimos") {
+        const orden = act.filter((d) => d.saldo > 0.005).sort(estrategia === "avalancha" ? (a, b) => b.tea - a.tea || a.saldo - b.saldo : (a, b) => a.saldo - b.saldo);
+        for (const d of orden) { if (avail <= 0.005) break; const p = Math.min(d.saldo, avail); d.saldo -= p; avail -= p; pay[d.id] += p; }
+      }
+      if (mes === 1) res.primerMes = pay;
+      for (const d of ds) if (d.saldo <= 0.005 && !res.payoff[d.id]) { d.saldo = 0; res.payoff[d.id] = mes; if (!res.primeraCerrada) res.primeraCerrada = mes; }
+    }
+    res.meses = mes;
+    res.nunca = ds.some((d) => d.saldo > 0.005);
+    return res;
+  }
+
+  function ordenEstrategia(list, estrategia) {
+    const l = [...list];
+    if (estrategia === "avalancha") l.sort((a, b) => b.tea - a.tea || a.saldo - b.saldo);
+    else if (estrategia === "bola") l.sort((a, b) => a.saldo - b.saldo);
+    return l;
+  }
+
+  function cuando(meses) {
+    if (meses >= 600) return "más de 50 años";
+    return `${meses} ${meses === 1 ? "mes" : "meses"} · ${monthName(shiftMonth(thisMonth(), meses - 1))}`;
+  }
+
+  /* ---------- Resumen del mes ---------- */
+  function summary(m, key) {
     const spentBy = {};
-    let ingresosExtra = 0, ahorro = 0, gastado = 0;
+    let ingresosExtra = 0, ahorro = 0, gastado = 0, deudaPagado = 0;
     for (const mv of m.movs) {
       if (mv.tipo === "gasto") { spentBy[mv.cat] = (spentBy[mv.cat] || 0) + mv.monto; gastado += mv.monto; }
       else if (mv.tipo === "ingreso") ingresosExtra += mv.monto;
       else if (mv.tipo === "ahorro") ahorro += mv.monto;
+      else if (mv.tipo === "deuda") deudaPagado += mv.monto;
     }
     const budgetIds = new Set(m.presupuesto.map((p) => p.id));
     let fijosTotal = 0, fijosPagado = 0, comprometido = 0, excesoFijos = 0;
@@ -425,49 +627,137 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     }
     let extra = 0;
     for (const [cat, v] of Object.entries(spentBy)) if (!budgetIds.has(cat)) extra += v;
+    // Págate primero: el ahorro y las deudas planeadas se descuentan antes de lo libre (en meses pasados solo cuenta lo real).
+    const past = key < thisMonth();
+    const ahorroPlan = m.ahorroPlan != null ? m.ahorroPlan : state.ahorroMensual;
+    const deudaPlan = past ? 0 : deudaPlanMes();
+    const ahorroComp = Math.max(ahorro, past ? 0 : ahorroPlan);
+    const deudaComp = Math.max(deudaPagado, deudaPlan);
     const ingresos = m.ingreso + ingresosExtra;
-    const libre = ingresos - comprometido - extra - ahorro;
-    return { spentBy, ingresos, ingresosExtra, ahorro, gastado, fijosTotal, fijosPagado, fijosPendiente: fijosTotal - fijosPagado, excesoFijos, extra, libre };
+    const libre = ingresos - comprometido - extra - ahorroComp - deudaComp;
+    return { spentBy, ingresos, ingresosExtra, ahorro, gastado, deudaPagado, deudaPlan, deudaComp, ahorroPlan, ahorroComp, fijosTotal, fijosPagado, fijosPendiente: fijosTotal - fijosPagado, excesoFijos, extra, libre };
   }
 
-  function totalAhorrado() {
-    let t = 0;
-    for (const m of Object.values(state.meses)) for (const mv of m.movs) if (mv.tipo === "ahorro") t += mv.monto;
-    return t;
+  function sugeridoAhorro(key) {
+    const s = summary(monthView(key), key);
+    const necesario = state.metas.reduce((a, meta) => a + metaInfo(meta, key).necesario, 0);
+    const base = necesario > 0 ? necesario : s.ingresos * 0.1;
+    const disponible = s.libre + s.ahorroComp;
+    return Math.max(0, Math.min(Math.ceil(base / 10) * 10, Math.floor(disponible / 10) * 10));
   }
 
-  function monthName(key, withYear = true) {
-    const [y, mo] = key.split("-").map(Number);
-    const name = new Date(y, mo - 1, 1).toLocaleDateString("es-PE", { month: "long" });
-    return withYear ? `${name} ${y}` : name;
+  /* ---------- Asesor ---------- */
+  function consejos() {
+    const key = current;
+    const m = monthView(key);
+    const s = summary(m, key);
+    const out = [];
+    const add = (p, nivel, titulo, texto, accion) => out.push({ p, nivel, titulo, texto, accion });
+    const isNow = key === thisMonth();
+
+    if (s.libre < 0) add(1, "bad", "Este mes no te alcanza", `Entre gastos fijos, deudas y el ahorro que planeaste te faltan <b>${money(-s.libre)}</b>. Baja el ahorro de este mes o recorta un gasto variable hasta cuadrar.`, { label: "Ajustar el plan", go: "plan" });
+
+    const { inicio } = deudasInicioMes();
+    const sumMin = sumMinimos(inicio);
+    if (inicio.length && state.estrategia !== "minimos" && state.deudaPresupuesto > 0 && state.deudaPresupuesto < sumMin) {
+      add(1, "bad", "Lo que pones para deudas no cubre los mínimos", `Las cuotas mínimas suman <b>${money(sumMin)}</b>. Si no pagas el mínimo te cobran mora e intereses extra, así que la app usa ese monto.`, { label: "Ajustar", go: "plan" });
+    }
+
+    for (const p of m.presupuesto) {
+      const used = s.spentBy[p.id] || 0;
+      if (p.monto > 0 && used > p.monto) add(2, "bad", `Te pasaste en ${esc(p.nombre)}`, `Llevas ${money(used)} de ${money(p.monto)} que tenías para esto.`);
+    }
+
+    if (isNow && s.ingresos > 0) {
+      const hoy = new Date();
+      const dia = hoy.getDate();
+      const diasMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+      const restantes = diasMes - dia + 1;
+      const paraVariables = s.libre + s.extra;
+      const proyectado = dia >= 3 ? (s.extra / dia) * diasMes : 0;
+      if (s.extra > 0 && proyectado > paraVariables && paraVariables > 0) {
+        add(2, "warn", "A este ritmo te vas a pasar", `Llevas ${money(s.extra)} en gastos variables en ${dia} días. Si sigues igual cerrarías el mes en ${money(proyectado)}, ${money(proyectado - paraVariables)} más de lo que tienes. Para cuadrar, gasta máximo <b>${money(Math.max(0, s.libre) / restantes)} al día</b>.`);
+      } else if (s.libre > 0) {
+        add(8, "info", "Tu tope diario", `Te quedan ${money(s.libre)} para ${restantes} ${restantes === 1 ? "día" : "días"}: unos <b>${money(s.libre / restantes)} al día</b> para gustos, salidas y todo lo que no es fijo.`);
+      }
+    }
+
+    if (inicio.length) {
+      const cara = ordenEstrategia(inicio, "avalancha")[0];
+      if (cara.tea >= 20) add(3, "warn", `Tu deuda más cara: ${esc(cara.nombre)}`, `Tiene una TEA de ${fmt.format(cara.tea)}%: cada S/ 100 que debes ahí te cuesta unos <b>${money(cara.tea)} al año</b>. Ningún ahorro común rinde eso. Después de juntar un colchón pequeño, lo extra debería ir aquí.`);
+      const pres = presupuestoDeudas(inicio);
+      const av = simulate(inicio, pres, "avalancha");
+      const bo = simulate(inicio, pres, "bola");
+      const mi = simulate(inicio, pres, "minimos");
+      if (state.estrategia === "minimos") {
+        if (mi.nunca) add(1, "bad", "Con solo mínimos no terminas de pagar", "Los intereses son más que tus cuotas mínimas, así que la deuda no baja. Pon más dinero al mes y elige Avalancha o Bola de nieve.", { label: "Ver deudas", go: "plan" });
+        else if (mi.intereses - av.intereses > 1) add(3, "bad", "Pagar solo mínimos te sale caro", `Terminarías en ${mi.meses} meses pagando ${money(mi.intereses)} de intereses. Con Avalancha y ${money(pres)} al mes: ${av.meses} meses y ${money(av.intereses)}.`, { label: "Cambiar estrategia", go: "plan" });
+      } else if (inicio.length >= 2) {
+        const diff = bo.intereses - av.intereses;
+        if (diff > 1 || av.primeraCerrada !== bo.primeraCerrada) add(5, "info", "Avalancha o Bola de nieve", `Con Avalancha pagas <b>${money(Math.max(0, diff))}</b> menos de intereses. Con Bola de nieve cierras tu primera deuda en el mes ${bo.primeraCerrada}; con Avalancha, en el mes ${av.primeraCerrada}.`, { label: "Comparar", go: "plan" });
+      }
+    }
+
+    if (s.fijosTotal > 0) {
+      const fondo = state.metas.find(esFondo);
+      if (!fondo) add(4, "warn", "Te falta un fondo de emergencia", `Es la base de todo: un colchón para imprevistos sin endeudarte. Una buena meta es 3 meses de tus gastos fijos: <b>${money(s.fijosTotal * 3)}</b>.`, { label: "Crear esta meta", act: "crearFondo" });
+      else {
+        const meses = ahorradoMeta(fondo) / s.fijosTotal;
+        if (meses < 1) add(4, "warn", "Tu colchón todavía es pequeño", `Cubre ${meses < 0.25 ? "menos de una semana" : `unas ${Math.round(meses * 4)} semanas`} de tus gastos fijos. Antes que otras metas, junta al menos 1 mes: ${money(s.fijosTotal)}.`);
+        else if (meses >= 3) add(9, "good", "Fondo de emergencia listo", `Cubre ${fmt.format(Math.floor(meses * 10) / 10)} meses de tus gastos fijos. Ahora tu ahorro puede ir a tus otras metas.`);
+      }
+    }
+
+    if (s.ingresos > 0 && s.fijosTotal / s.ingresos >= 0.6) {
+      const top = [...m.presupuesto].sort((a, b) => b.monto - a.monto).slice(0, 2);
+      const sumTop = top.reduce((a, x) => a + x.monto, 0);
+      add(5, "warn", `Tus fijos son el ${Math.round((s.fijosTotal / s.ingresos) * 100)}% de tu ingreso`, `Lo sano es no pasar del 50–60%. Los más grandes son ${top.map((t) => `${esc(t.nombre)} (${money(t.monto)})`).join(" y ")}. Bajarlos un 10% te libera <b>${money(sumTop * 0.1)} al mes</b>.`);
+    }
+
+    if (s.ingresos > 0) {
+      const tasa = s.ahorroPlan / s.ingresos;
+      const meta10 = Math.ceil((s.ingresos * 0.1) / 10) * 10;
+      const quedaria = s.libre - (meta10 - s.ahorroPlan);
+      if (tasa < 0.1 && quedaria >= 0) add(6, "info", "Intenta ahorrar el 10%", `Tu plan de ${esc(monthName(key, false))} es ${money(s.ahorroPlan)} (${Math.round(tasa * 100)}% de lo que entra). Con ${money(meta10)} todavía te quedarían ${money(quedaria)} libres.`, { label: "Ajustar", go: "plan" });
+      else if (tasa >= 0.2) add(9, "good", `Ahorras el ${Math.round(tasa * 100)}% de tu ingreso`, "Vas muy bien. Mantén el ritmo y revisa tus metas cada mes.");
+    }
+
+    const necesario = state.metas.reduce((a, meta) => a + metaInfo(meta, key).necesario, 0);
+    if (necesario > s.ahorroPlan + 0.5) add(6, "warn", "Tus metas piden más de lo que ahorras", `Para llegar a tiempo necesitas ${money(necesario)} al mes y tu plan es ${money(s.ahorroPlan)}. Sube el ahorro, mueve una fecha o deja una meta para después.`, { label: "Ver metas", go: "plan" });
+    const vencida = state.metas.find((meta) => metaInfo(meta, key).vencida);
+    if (vencida) add(6, "info", `La fecha de "${esc(vencida.nombre)}" ya pasó`, "Ponle una fecha nueva para que la app calcule cuánto apartar al mes.", { label: "Ver metas", go: "plan" });
+
+    const prevKey = shiftMonth(key, -1);
+    const prev = state.meses[prevKey];
+    if (prev) {
+      const sp = summary(prev, prevKey).spentBy;
+      for (const c of EXTRA_CATS) {
+        const ahora = s.spentBy[c.id] || 0, antes = sp[c.id] || 0;
+        if (antes > 0 && ahora > antes) add(7, "info", `Más en ${c.nombre.toLowerCase()} que el mes pasado`, `Llevas ${money(ahora)} y en todo ${esc(monthName(prevKey, false))} fueron ${money(antes)}.`);
+      }
+    }
+
+    const n = streak();
+    if (n >= 7) add(10, "good", `${n} días seguidos con tu cierre`, "Registrar todos los días es lo que más ayuda a ordenar la plata. Sigue así.");
+    else if (isNow && n === 0 && Object.keys(state.cierres).length) add(8, "info", "Retoma tu cierre del día", "Anota hoy lo que gastaste y vuelve a empezar tu racha.", { label: "Ir a Hoy", go: "hoy" });
+
+    if (!out.length) add(10, "good", "Todo en orden", "Tus números de este mes están sanos. Sigue registrando y revisa tu plan cada semana.");
+    return out.sort((a, b) => a.p - b.p);
   }
 
-  function shiftMonth(key, delta) {
-    const [y, mo] = key.split("-").map(Number);
-    const d = new Date(y, mo - 1 + delta, 1);
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
-  }
-
-  function catName(m, id) {
-    const p = m.presupuesto.find((x) => x.id === id) || state.fijos.find((x) => x.id === id) || EXTRA_CATS.find((x) => x.id === id);
-    return p ? p.nombre : "Otros";
+  function consejoHtml(c) {
+    const accion = c.accion ? `<button class="link" ${c.accion.go ? `data-go="${c.accion.go}"` : `data-act="${c.accion.act}"`}>${c.accion.label}</button>` : "";
+    return `<div class="tip" style="--c:${NIVEL[c.nivel]}"><span class="dot"></span><div class="tip-body"><b>${c.titulo}</b><p>${c.texto}</p>${accion}</div></div>`;
   }
 
   /* ---------- Vista: Mi mes ---------- */
   function renderInicio() {
     const m = monthView(current);
-    const s = summary(m);
+    const s = summary(m, current);
     const mes = monthName(current, false);
     const pct = (v) => s.ingresos > 0 ? Math.max(0, (v / s.ingresos) * 100) : 0;
     const libreBar = Math.max(0, s.libre);
-
-    const tips = [];
-    const ratio = s.ingresos > 0 ? s.fijosTotal / s.ingresos : 0;
-    if (ratio >= 0.7) tips.push({ c: "var(--warn)", t: `Tus gastos fijos se llevan el <b>${Math.round(ratio * 100)}%</b> de lo que entra. Lo sano es que no pasen del 50–60%. Revisa cuál puedes bajar.` });
-    if (s.libre < 0) tips.push({ c: "var(--bad)", t: `Este mes vas <b>${money(-s.libre)}</b> por encima de lo que entró. Frena los gustos hasta el próximo ingreso.` });
-    else if (s.ahorro === 0 && state.ahorroMensual > 0 && s.libre >= state.ahorroMensual) tips.push({ c: "var(--accent)", t: `Págate primero: aparta <b>${money(state.ahorroMensual)}</b> apenas cobres y vive con el resto.` });
-    if (s.excesoFijos > 0) tips.push({ c: "var(--bad)", t: `Te pasaste <b>${money(s.excesoFijos)}</b> en tus gastos fijos. Revisa cuáles están en rojo.` });
-    if (s.extra > 0) tips.push({ c: "var(--muted)", t: `Llevas <b>${money(s.extra)}</b> en gastos fuera de tu lista fija.` });
+    const tips = consejos();
 
     const fijosRows = m.presupuesto.map((p) => {
       const used = s.spentBy[p.id] || 0;
@@ -475,25 +765,44 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       const done = used >= p.monto;
       const w = p.monto > 0 ? Math.min(100, (used / p.monto) * 100) : 100;
       const meta = used === 0 ? `${money(p.monto)} por pagar` : saldo > 0 ? `${money(used)} de ${money(p.monto)} · quedan ${money(saldo)}` : saldo < 0 ? `Te pasaste ${money(-saldo)}` : "Pagado completo";
+      const undo = used > 0 ? `<button class="link" data-undo-fijo="${esc(p.id)}">Deshacer</button>` : "";
       return `<div class="row">
         <span class="name">${esc(p.nombre)}</span>
         <div class="side">
           <span class="amt">${money(p.monto)}</span>
           ${done ? `<span class="pill done">Listo</span>` : `<button class="pill" data-pay="${esc(p.id)}">Pagar</button>`}
         </div>
-        <span class="meta">${meta}</span>
+        <span class="meta">${meta} ${undo}</span>
         <div class="meter${saldo < 0 ? " over" : ""}"><i style="width:${w}%"></i></div>
       </div>`;
     }).join("");
 
-    const ahorrado = totalAhorrado();
-    const meta = state.metaFondo || 0;
-    const goalPct = meta > 0 ? Math.min(100, (ahorrado / meta) * 100) : 0;
-    const faltan = Math.max(0, meta - ahorrado);
-    const meses = state.ahorroMensual > 0 ? Math.ceil(faltan / state.ahorroMensual) : 0;
+    let deudasHtml = "";
+    if (current === thisMonth()) {
+      const { inicio, pagado } = deudasInicioMes();
+      if (inicio.length) {
+        const sim = simulate(inicio, presupuestoDeudas(inicio), state.estrategia);
+        const rows = ordenEstrategia(inicio, state.estrategia).map((d) => {
+          const actual = state.deudas.find((x) => x.id === d.id);
+          const rec = sim.primerMes[d.id] || 0;
+          const pend = Math.max(0, round2(rec - (pagado[d.id] || 0)));
+          return `<div class="row">
+            <span class="name">${esc(d.nombre)}</span>
+            <div class="side"><span class="amt">${money(actual ? actual.saldo : 0)}</span>${pend > 0 ? `<button class="pill" data-pay-deuda="${esc(d.id)}">Pagar</button>` : `<span class="pill done">Listo</span>`}</div>
+            <span class="meta">${pend > 0 ? `Este mes paga ${money(pend)}` : `Pago del mes hecho`}${pagado[d.id] ? ` · pagaste ${money(pagado[d.id])}` : ""}</span>
+          </div>`;
+        }).join("");
+        deudasHtml = `<div class="section">
+          <div class="section-head"><h2>Deudas</h2><span class="num">${money(s.deudaPagado)} de ${money(s.deudaPlan)} este mes</span></div>
+          <div class="list">${rows}</div>
+          <button class="link" data-go="plan">Estrategia: ${ESTRATEGIAS[state.estrategia].nombre} · libre de deudas en ${sim.nunca ? "nunca con este plan" : esc(cuando(sim.meses))}</button>
+        </div>`;
+      }
+    }
 
+    const plan = s.ahorroPlan;
     const now = new Date();
-    const needsClose = current === monthKeyOf(todayISO()) && now.getHours() >= 19 && !state.cierres[todayISO()];
+    const needsClose = current === thisMonth() && now.getHours() >= 19 && !state.cierres[todayISO()];
     const isEmpty = !state.fijos.length && !m.ingreso && !m.movs.length;
 
     document.getElementById("view-inicio").innerHTML = `
@@ -502,12 +811,12 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       <div class="hero">
         <p class="eyebrow">Libre para gastar en ${esc(mes)}</p>
         <p class="big${s.libre < 0 ? " neg" : ""}"><small>S/</small>${s.libre < 0 ? "−" : ""}${fmt.format(Math.abs(s.libre))}</p>
-        <p class="sub">Entraron <b class="num">${money(s.ingresos)}</b> · fijos <b class="num">${money(s.fijosTotal)}</b>${s.ahorro ? ` · ahorro <b class="num">${money(s.ahorro)}</b>` : ""}</p>
+        <p class="sub">Entraron <b class="num">${money(s.ingresos)}</b> · fijos <b class="num">${money(s.fijosTotal)}</b>${s.deudaComp ? ` · deudas <b class="num">${money(s.deudaComp)}</b>` : ""}${s.ahorroComp ? ` · ahorro <b class="num">${money(s.ahorroComp)}</b>` : ""}</p>
         <div class="stack" role="img" aria-label="Reparto del ingreso del mes">
-          <i style="width:${pct(s.fijosPagado)}%;background:var(--bar-paid)"></i>
-          <i style="width:${pct(s.fijosPendiente + s.excesoFijos)}%;background:var(--bar-pending)"></i>
+          <i style="width:${pct(s.fijosPagado + s.deudaPagado)}%;background:var(--bar-paid)"></i>
+          <i style="width:${pct(s.fijosPendiente + s.excesoFijos + s.deudaComp - s.deudaPagado)}%;background:var(--bar-pending)"></i>
           <i style="width:${pct(s.extra)}%;background:var(--bar-extra)"></i>
-          <i style="width:${pct(s.ahorro)}%;background:var(--accent)"></i>
+          <i style="width:${pct(s.ahorroComp)}%;background:var(--accent)"></i>
           <i style="width:${pct(libreBar)}%;background:var(--good)"></i>
         </div>
         <div class="legend">
@@ -519,18 +828,23 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
         </div>
       </div>
 
-      ${tips.length ? `<div class="tips">${tips.map((t) => `<div class="tip" style="--c:${t.c}"><span class="dot"></span><p>${t.t}</p></div>`).join("")}</div>` : ""}
+      ${isEmpty ? "" : `<div class="tips">${tips.slice(0, 2).map(consejoHtml).join("")}${tips.length > 2 ? `<button class="link" data-go="plan">Ver los ${tips.length} consejos de tu asesor</button>` : ""}</div>`}
 
       <div class="section">
         <div class="section-head"><h2>Gastos fijos</h2><span class="num">${money(s.fijosPagado)} de ${money(s.fijosTotal)} pagado</span></div>
         <div class="list">${fijosRows || `<div class="row"><span class="meta">Agrega tus gastos fijos en Ajustes.</span></div>`}</div>
       </div>
 
+      ${deudasHtml}
+
       <div class="goal">
-        <div class="line"><h2>Fondo de emergencia</h2><b>${money(ahorrado)}</b></div>
-        <div class="meter"><i style="width:${goalPct}%"></i></div>
-        <p>${meta > 0 ? (faltan > 0 ? `Meta ${money(meta)} (unos 3 meses de tus gastos fijos). Faltan ${money(faltan)}${meses ? `: apartando ${money(state.ahorroMensual)} al mes llegas en ${meses} ${meses === 1 ? "mes" : "meses"}` : ""}.` : "Llegaste a tu meta. Ahora el ahorro puede ir a otro objetivo.") : "Define una meta en Ajustes."}</p>
-        ${state.ahorroMensual > 0 ? `<button class="btn accent" data-save="1">Apartar ${money(state.ahorroMensual)}</button>` : ""}
+        <div class="line"><h2>Ahorro de ${esc(mes)}</h2><b>${money(s.ahorro)}</b></div>
+        <div class="meter"><i style="width:${plan > 0 ? Math.min(100, (s.ahorro / plan) * 100) : 0}%"></i></div>
+        <p>${plan > 0 ? (s.ahorro >= plan ? `Cumpliste tu plan de ${money(plan)}.` : `Tu plan: ${money(plan)}. Faltan ${money(plan - s.ahorro)}.`) : "Todavía no tienes un plan de ahorro para este mes."} En total llevas ${money(totalAhorrado())} ahorrados.</p>
+        <div class="btns">
+          ${plan > s.ahorro ? `<button class="btn accent" data-save="1">Apartar ${money(plan - s.ahorro)}</button>` : ""}
+          <button class="btn ghost" data-go="plan">Metas y plan</button>
+        </div>
       </div>`;
   }
 
@@ -569,9 +883,9 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 
     const cats = [...m.presupuesto, ...EXTRA_CATS];
     const rows = movs.map((mv) => {
-      const label = mv.tipo === "gasto" ? catName(m, mv.cat) : mv.tipo === "ingreso" ? "Ingreso" : "Ahorro";
       const cls = mv.tipo === "ingreso" ? " in" : mv.tipo === "ahorro" ? " save" : "";
-      return `<div class="row"><span class="name">${esc(label)}</span><div class="side"><span class="amt${cls}">${mv.tipo === "gasto" ? "−" : "+"} ${money(mv.monto)}</span></div><span class="meta">${mv.nota ? esc(mv.nota) : ""}</span></div>`;
+      const sign = mv.tipo === "gasto" || mv.tipo === "deuda" ? "−" : "+";
+      return `<div class="row"><span class="name">${esc(movLabel(m, mv))}</span><div class="side"><span class="amt${cls}">${sign} ${money(mv.monto)}</span></div><span class="meta">${mv.nota ? esc(mv.nota) : ""}</span></div>`;
     }).join("");
 
     document.getElementById("view-hoy").innerHTML = `
@@ -594,22 +908,122 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
         : `<button class="btn accent block" data-close="1">${movs.length ? "Listo, cerrar el día" : "Hoy no gasté nada"}</button>`}`;
   }
 
-  document.getElementById("view-hoy").addEventListener("click", (e) => {
-    const q = e.target.closest("[data-quick]");
-    if (q) { current = monthKeyOf(todayISO()); openSheet({ tipo: "gasto", cat: q.dataset.quick, fecha: todayISO() }); return; }
-    if (e.target.closest("[data-close]")) {
-      state.cierres[todayISO()] = true; save(); render();
-      const n = streak();
-      toast(n > 1 ? `Día cerrado. Llevas ${n} días seguidos` : "Día cerrado");
-      return;
-    }
-    if (e.target.closest("[data-reopen]")) { delete state.cierres[todayISO()]; save(); render(); }
-  });
+  /* ---------- Vista: Plan ---------- */
+  function renderPlan() {
+    const key = current;
+    const m = monthView(key);
+    const s = summary(m, key);
+    const mes = monthName(key, false);
+    const tips = consejos();
+    const sug = sugeridoAhorro(key);
+    const tasa = s.ingresos > 0 ? Math.round((s.ahorroPlan / s.ingresos) * 100) : 0;
 
-  /* ---------- Vista: Movimientos ---------- */
+    const metasHtml = state.metas.map((meta) => {
+      const info = metaInfo(meta, key);
+      const w = meta.objetivo > 0 ? Math.min(100, (info.ahorrado / meta.objetivo) * 100) : 0;
+      let detalle;
+      if (info.faltan <= 0) detalle = "¡Meta cumplida!";
+      else if (info.vencida) detalle = `La fecha ya pasó y faltan ${money(info.faltan)}. Ponle una fecha nueva.`;
+      else if (meta.fecha) detalle = `Para ${esc(monthName(meta.fecha))}: aparta <b>${money(info.necesario)} al mes</b> durante ${info.mesesRest} ${info.mesesRest === 1 ? "mes" : "meses"}.`;
+      else if (s.ahorroPlan > 0) { const n = Math.ceil(info.faltan / s.ahorroPlan); detalle = `Sin fecha. Faltan ${money(info.faltan)}: con todo tu ahorro del mes (${money(s.ahorroPlan)}) llegas en ${n} ${n === 1 ? "mes" : "meses"}, en ${esc(monthName(shiftMonth(key, n - 1)))}.`; }
+      else detalle = `Sin fecha. Faltan ${money(info.faltan)}.`;
+      return `<div class="item${info.faltan <= 0 ? " done" : ""}">
+        <div class="item-head"><b>${esc(meta.nombre)}</b><span class="amt">${money(info.ahorrado)} / ${money(meta.objetivo)}</span></div>
+        <div class="meter"><i style="width:${w}%"></i></div>
+        <p class="meta">${detalle}</p>
+        <div class="btns">${info.faltan > 0 ? `<button class="pill" data-meta-save="${esc(meta.id)}">Apartar</button>` : ""}<button class="pill" data-edit-meta="${esc(meta.id)}">Editar</button></div>
+      </div>`;
+    }).join("");
+
+    const { inicio, pagado } = deudasInicioMes();
+    let deudasHtml = "";
+    const deudasList = state.deudas.map((d) => {
+      const paid = d.saldo <= 0.005;
+      return `<div class="item${paid ? " done" : ""}">
+        <div class="item-head"><b>${esc(d.nombre)}</b><span class="amt">${paid ? "Pagada" : money(d.saldo)}</span></div>
+        <p class="meta">TEA ${fmt.format(d.tea || 0)}% · cuota mínima ${money(d.minimo || 0)}</p>
+        <div class="btns">${paid ? "" : `<button class="pill" data-pay-deuda="${esc(d.id)}">Pagar</button>`}<button class="pill" data-edit-deuda="${esc(d.id)}">Editar</button></div>
+      </div>`;
+    }).join("");
+
+    if (inicio.length) {
+      const sumMin = sumMinimos(inicio);
+      const pres = presupuestoDeudas(inicio);
+      const sims = Object.fromEntries(Object.keys(ESTRATEGIAS).map((k) => [k, simulate(inicio, pres, k)]));
+      const elegida = sims[state.estrategia];
+      const cards = Object.entries(ESTRATEGIAS).map(([k, e]) => {
+        const r = sims[k];
+        return `<button class="strategy" data-estrategia="${k}" aria-pressed="${state.estrategia === k}">
+          <b>${e.nombre}${k === "avalancha" ? `<span class="badge">Menos intereses</span>` : ""}</b>
+          <span>${e.corto}</span>
+          <span class="stats">${r.nunca ? "No terminas nunca: la cuota no cubre los intereses" : `<span>Libre en ${esc(cuando(r.meses))}</span><span>Intereses ${money(r.intereses)}</span>`}</span>
+        </button>`;
+      }).join("");
+      const planRows = ordenEstrategia(inicio, state.estrategia).map((d, i) => {
+        const rec = elegida.primerMes[d.id] || 0;
+        const pend = Math.max(0, round2(rec - (pagado[d.id] || 0)));
+        const extra = Math.max(0, rec - minDe(d));
+        return `<div class="row">
+          <span class="name">${i + 1}. ${esc(d.nombre)}${extra > 0.5 ? `<span class="badge">Foco</span>` : ""}</span>
+          <div class="side"><span class="amt">${money(rec)}</span></div>
+          <span class="meta">${extra > 0.5 ? `Mínimo ${money(minDe(d))} + extra ${money(extra)}` : "Solo el mínimo"}${elegida.payoff[d.id] ? ` · la terminas en ${esc(monthName(shiftMonth(thisMonth(), elegida.payoff[d.id] - 1)))}` : ""}${pend <= 0 ? " · ya pagado" : ""}</span>
+        </div>`;
+      }).join("");
+      deudasHtml = `
+        <div class="card">
+          <div class="field"><label for="deudaPresupuesto">Cada mes puedo poner para deudas</label><div class="money"><input class="input" id="deudaPresupuesto" inputmode="decimal" placeholder="${round2(sumMin)}" value="${numVal(state.deudaPresupuesto)}" /></div></div>
+          <p>Las cuotas mínimas suman ${money(sumMin)}. Todo lo que pongas encima acelera el pago y te ahorra intereses.</p>
+        </div>
+        <div class="section">
+          <div class="section-head"><h2>¿Cómo las atacas?</h2></div>
+          <div class="strategies">${cards}</div>
+          <p class="hint" style="margin:0">${ESTRATEGIAS[state.estrategia].texto}</p>
+        </div>
+        <div class="section">
+          <div class="section-head"><h2>Qué pagar en ${esc(monthName(thisMonth(), false))}</h2><span class="num">${money(pres)}</span></div>
+          <div class="list">${planRows}</div>
+        </div>`;
+    }
+
+    document.getElementById("view-plan").innerHTML = `
+      <div class="hero">
+        <p class="eyebrow">Tu plan · ${esc(monthName(key))}</p>
+        <h2 class="plan-title">Qué hacer con tu plata este mes</h2>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Tu asesor</h2><span>${tips.length} ${tips.length === 1 ? "consejo" : "consejos"}</span></div>
+        <div class="tips">${tips.map(consejoHtml).join("")}</div>
+      </div>
+
+      <div class="card">
+        <h3>Ahorro de ${esc(mes)}</h3>
+        <div class="two">
+          <div class="field"><label for="planAhorroMes">Este mes voy a ahorrar</label><div class="money"><input class="input" id="planAhorroMes" inputmode="decimal" placeholder="0" value="${numVal(s.ahorroPlan)}" /></div></div>
+          <div class="field"><label for="ahorroDefault">Por defecto cada mes</label><div class="money"><input class="input" id="ahorroDefault" inputmode="decimal" placeholder="0" value="${numVal(state.ahorroMensual)}" /></div></div>
+        </div>
+        <p>${s.ingresos > 0 ? `Es el ${tasa}% de lo que entra. ` : ""}${sug > 0 && sug !== s.ahorroPlan ? `Te sugiero <b>${money(sug)}</b>${state.metas.some((x) => x.fecha) ? " para llegar a tus metas a tiempo" : " (10% de tu ingreso)"}.` : ""} Si cambias solo este mes, los demás meses siguen con el monto por defecto.</p>
+        ${sug > 0 && sug !== s.ahorroPlan ? `<button class="btn ghost" data-act="usarSugerido">Usar ${money(sug)} este mes</button>` : ""}
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Metas a largo plazo</h2><span class="num">${money(totalAhorrado())} ahorrados</span></div>
+        ${metasHtml ? `<div class="items">${metasHtml}</div>` : `<div class="empty"><b>Aún no tienes metas</b>Crea una con nombre, monto y fecha (un viaje, una laptop, tu fondo de emergencia) y la app te dice cuánto apartar cada mes.</div>`}
+        <button class="btn ghost" data-new-meta="1">Nueva meta</button>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Deudas</h2>${inicio.length ? `<span class="num">Debes ${money(state.deudas.reduce((a, d) => a + d.saldo, 0))}</span>` : ""}</div>
+        ${deudasList ? `<div class="items">${deudasList}</div>` : `<div class="empty"><b>Sin deudas registradas</b>Si tienes tarjetas o préstamos, agrégalos con su saldo, su TEA y la cuota mínima. La app te arma un plan para salir de ellos.</div>`}
+        <button class="btn ghost" data-new-deuda="1">Agregar deuda</button>
+      </div>
+      ${deudasHtml}`;
+  }
+
+  /* ---------- Vista: Historial ---------- */
   function renderMovimientos() {
     const m = monthView(current);
-    const s = summary(m);
+    const s = summary(m, current);
     const movs = [...m.movs].sort((a, b) => (b.fecha + b.id).localeCompare(a.fecha + a.id));
     const el = document.getElementById("view-movimientos");
 
@@ -620,7 +1034,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     let html = `<div class="hero">
       <p class="eyebrow">Gastado en ${esc(monthName(current, false))}</p>
       <p class="big"><small>S/</small>${fmt.format(s.gastado)}</p>
-      <p class="sub">${m.movs.length} ${m.movs.length === 1 ? "movimiento" : "movimientos"} · ingresos extra <b class="num">${money(s.ingresosExtra)}</b> · ahorro <b class="num">${money(s.ahorro)}</b></p>
+      <p class="sub">${m.movs.length} ${m.movs.length === 1 ? "movimiento" : "movimientos"} · ingresos extra <b class="num">${money(s.ingresosExtra)}</b> · ahorro <b class="num">${money(s.ahorro)}</b>${s.deudaPagado ? ` · deudas <b class="num">${money(s.deudaPagado)}</b>` : ""}</p>
     </div>`;
 
     if (cats.length) html += `<div class="section"><div class="section-head"><h2>¿En qué se fue?</h2></div><div class="card cats">${catHtml}</div></div>`;
@@ -638,11 +1052,10 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
           html += `<p class="day">${esc(new Date(y, mo - 1, d).toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" }))}</p><div class="list">`;
           open = true; lastDay = mv.fecha;
         }
-        const label = mv.tipo === "gasto" ? catName(m, mv.cat) : mv.tipo === "ingreso" ? "Ingreso" : "Ahorro";
         const cls = mv.tipo === "ingreso" ? " in" : mv.tipo === "ahorro" ? " save" : "";
-        const sign = mv.tipo === "gasto" ? "−" : "+";
+        const sign = mv.tipo === "gasto" || mv.tipo === "deuda" ? "−" : "+";
         html += `<div class="row">
-          <span class="name">${esc(label)}</span>
+          <span class="name">${esc(movLabel(m, mv))}</span>
           <div class="side"><span class="amt${cls}">${sign} ${money(mv.monto)}</span><button class="pill danger" data-del="${esc(mv.id)}">Borrar</button></div>
           <span class="meta">${mv.nota ? esc(mv.nota) : ""}</span>
         </div>`;
@@ -659,7 +1072,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     const fijosHtml = state.fijos.map((f) => `
       <div class="fixed-row">
         <input class="input" id="fn-${esc(f.id)}" data-fname="${esc(f.id)}" value="${esc(f.nombre)}" aria-label="Nombre del gasto fijo" />
-        <div class="money"><input class="input" id="fm-${esc(f.id)}" data-fmonto="${esc(f.id)}" inputmode="decimal" value="${f.monto}" aria-label="Monto de ${esc(f.nombre)}" /></div>
+        <div class="money"><input class="input" id="fm-${esc(f.id)}" data-fmonto="${esc(f.id)}" inputmode="decimal" placeholder="0" value="${numVal(f.monto)}" aria-label="Monto de ${esc(f.nombre)}" /></div>
         <button class="icon-btn" data-fdel="${esc(f.id)}" aria-label="Quitar ${esc(f.nombre)}">×</button>
       </div>`).join("");
     const totalFijos = state.fijos.reduce((a, f) => a + f.monto, 0);
@@ -669,7 +1082,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 
       <div class="card">
         <h3>Ingreso del mes</h3>
-        <div class="field"><label for="ingresoMes">Lo que entra en ${esc(monthName(current, false))}</label><div class="money"><input class="input" id="ingresoMes" inputmode="decimal" value="${m.ingreso}" /></div></div>
+        <div class="field"><label for="ingresoMes">Lo que entra en ${esc(monthName(current, false))}</label><div class="money"><input class="input" id="ingresoMes" inputmode="decimal" placeholder="0" value="${numVal(m.ingreso)}" /></div></div>
         <p>Si te entra algo extra (un cachuelo, un bono), regístralo con + como Ingreso.</p>
       </div>
 
@@ -677,15 +1090,6 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
         <h3>Gastos fijos · <span class="num">${money(totalFijos)}</span></h3>
         <div class="cats">${fijosHtml}</div>
         <button class="btn ghost" id="addFijo">Agregar gasto fijo</button>
-      </div>
-
-      <div class="card">
-        <h3>Ahorro</h3>
-        <div class="two">
-          <div class="field"><label for="metaFondo">Meta del fondo</label><div class="money"><input class="input" id="metaFondo" inputmode="decimal" value="${state.metaFondo}" /></div></div>
-          <div class="field"><label for="ahorroMensual">Apartar al mes</label><div class="money"><input class="input" id="ahorroMensual" inputmode="decimal" value="${state.ahorroMensual}" /></div></div>
-        </div>
-        <p>Una buena meta es cubrir 3 meses de gastos fijos.</p>
       </div>
 
       <div class="card">
@@ -703,79 +1107,60 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       </div>`;
   }
 
-  /* ---------- Notificaciones ---------- */
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
-  const pushSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window && location.protocol === "https:";
-
-  function notifHtml() {
-    if (isIOS && !isStandalone) return `<p>En iPhone las notificaciones funcionan con la app instalada. Toca <b>Compartir → Agregar a inicio</b>, abre Sol a Sol desde su ícono y vuelve aquí.</p>`;
-    if (!pushSupported) return `<p>Las notificaciones funcionan en la app instalada desde <b>renzomoran9.github.io/Sol-a-Sol</b>. Ábrela ahí en tu celular para activarlas.</p>`;
-    const perm = Notification.permission;
-    if (perm === "denied") return `<p class="status warn">Bloqueaste las notificaciones para esta app.</p><p>Actívalas en los ajustes del celular (Notificaciones → Sol a Sol) y vuelve aquí.</p>`;
-    if (!state.push) return `<p>Cada noche cerca de las 9 pm te llega un aviso para hacer el cierre del día.</p><button class="btn accent" id="enablePush">Activar notificaciones</button>`;
-    return `<p class="status ok">Notificaciones activadas en este celular.</p>
-      <p>Falta un paso, solo una vez: guardar este código en GitHub para que el aviso de las 9 pm sepa a qué celular llegar.</p>
-      <ol class="steps">
-        <li>Toca <b>Copiar código</b>.</li>
-        <li>Abre <a href="${SECRETS_URL}" target="_blank" rel="noopener">los secretos de tu repo sol-a-sol</a> y toca <b>New repository secret</b>.</li>
-        <li>Nombre: <b>PUSH_SUBSCRIPTION</b>. En Secret pega el código y guarda.</li>
-      </ol>
-      <textarea class="input" id="pushCode" readonly>${esc(JSON.stringify(state.push))}</textarea>
-      <div class="btns"><button class="btn" id="copyPush">Copiar código</button><button class="btn ghost" id="testPush">Probar aviso</button></div>`;
-  }
-
-  function urlB64ToUint8(b64) {
-    const pad64 = "=".repeat((4 - (b64.length % 4)) % 4);
-    const raw = atob((b64 + pad64).replace(/-/g, "+").replace(/_/g, "/"));
-    return Uint8Array.from(raw, (c) => c.charCodeAt(0));
-  }
-
-  async function enablePush() {
-    try {
-      const perm = await Notification.requestPermission();
-      if (perm !== "granted") { render(); return; }
-      const reg = await navigator.serviceWorker.ready;
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC) });
-      state.push = sub.toJSON(); save(); render();
-      toast("Notificaciones activadas");
-    } catch (e) {
-      toast("No se pudo activar. Revisa tu conexión e inténtalo otra vez");
-    }
-  }
-
-  async function testPush() {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification("Sol a Sol", { body: "Así se verá tu recordatorio de cada noche.", icon: "icon-192.png", badge: "icon-192.png", data: { url: "./?cierre=1" } });
-    } catch (e) { toast("No se pudo mostrar el aviso"); }
-  }
-
   function render() {
     document.getElementById("monthLabel").textContent = monthName(current);
     for (const sec of document.querySelectorAll("[data-view]")) sec.hidden = sec.dataset.view !== view;
     for (const b of document.querySelectorAll("[data-tab]")) { if (b.dataset.tab === view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }
-    document.getElementById("fab").hidden = view === "ajustes" || view === "hoy";
+    document.getElementById("fab").hidden = view === "ajustes" || view === "hoy" || view === "plan";
     if (view === "inicio") renderInicio();
     else if (view === "hoy") renderHoy();
+    else if (view === "plan") renderPlan();
     else if (view === "movimientos") renderMovimientos();
     else renderAjustes();
   }
 
-  /* ---------- Acciones ---------- */
-  let toastTimer;
-  function toast(msg) {
+  /* ---------- Movimientos: agregar y deshacer ---------- */
+  let toastTimer, toastUndoId = null;
+  function toast(msg, undoId) {
     const t = document.getElementById("toast");
-    t.textContent = msg; t.hidden = false;
+    toastUndoId = undoId || null;
+    t.innerHTML = `<span>${esc(msg)}</span>${undoId ? `<button type="button" id="toastUndo">Deshacer</button>` : ""}`;
+    t.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 2200);
+    toastTimer = setTimeout(() => { t.hidden = true; toastUndoId = null; }, undoId ? 5000 : 2200);
   }
+  document.getElementById("toast").addEventListener("click", (e) => {
+    if (!e.target.closest("#toastUndo") || !toastUndoId) return;
+    removeMov(toastUndoId);
+    render();
+    toast("Listo, se deshizo");
+  });
 
   function addMov(mv) {
     const key = monthKeyOf(mv.fecha);
-    getMonth(key, true).movs.push({ id: uid(), ...mv });
+    const item = { id: uid(), ...mv };
+    if (mv.tipo === "deuda") {
+      const d = state.deudas.find((x) => x.id === mv.deuda);
+      if (d) { const antes = d.saldo; d.saldo = round2(Math.max(0, d.saldo - mv.monto)); item.aplicado = round2(antes - d.saldo); }
+    }
+    getMonth(key, true).movs.push(item);
     save();
+    return item.id;
+  }
+
+  function removeMov(id) {
+    for (const m of Object.values(state.meses)) {
+      const mv = m.movs.find((x) => x.id === id);
+      if (!mv) continue;
+      if (mv.tipo === "deuda") {
+        const d = state.deudas.find((x) => x.id === mv.deuda);
+        if (d) d.saldo = round2(d.saldo + (mv.aplicado != null ? mv.aplicado : mv.monto));
+      }
+      m.movs = m.movs.filter((x) => x.id !== id);
+      save();
+      return true;
+    }
+    return false;
   }
 
   function defaultDate() {
@@ -783,86 +1168,246 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     return monthKeyOf(t) === current ? t : `${current}-01`;
   }
 
-  // Hoja de registro
+  /* ---------- Hoja de registro ---------- */
   const sheet = document.getElementById("sheet");
-  let sheetTipo = "gasto", sheetCat = null;
+  let sheetTipo = "gasto", sheetSel = null;
 
-  function renderSheetCats() {
-    const m = monthView(current);
-    const list = [...m.presupuesto, ...EXTRA_CATS];
-    if (!sheetCat || !list.some((c) => c.id === sheetCat)) sheetCat = "gustos";
-    document.getElementById("movCats").innerHTML = list.map((c) => `<button type="button" class="chip" data-cat="${esc(c.id)}" aria-pressed="${c.id === sheetCat}">${esc(c.nombre)}</button>`).join("");
+  function sheetOptions(t) {
+    if (t === "gasto") { const m = monthView(current); return [...m.presupuesto, ...EXTRA_CATS]; }
+    if (t === "ahorro") return state.metas;
+    if (t === "deuda") return state.deudas.filter((d) => d.saldo > 0.005);
+    return [];
   }
 
-  function setTipo(t) {
+  function renderSheetCats() {
+    const list = sheetOptions(sheetTipo);
+    if (!list.some((c) => c.id === sheetSel)) sheetSel = sheetTipo === "gasto" && list.some((c) => c.id === "gustos") ? "gustos" : (list[0] ? list[0].id : null);
+    document.getElementById("catField").hidden = !list.length;
+    document.getElementById("catLabel").textContent = sheetTipo === "ahorro" ? "¿Para qué meta?" : sheetTipo === "deuda" ? "¿Qué deuda?" : "¿En qué?";
+    document.getElementById("movCats").innerHTML = list.map((c) => `<button type="button" class="chip" data-cat="${esc(c.id)}" aria-pressed="${c.id === sheetSel}">${esc(c.nombre)}</button>`).join("");
+  }
+
+  function setTipo(t, titulo) {
     sheetTipo = t;
     for (const b of document.querySelectorAll("[data-tipo]")) b.setAttribute("aria-pressed", String(b.dataset.tipo === t));
-    document.getElementById("catField").hidden = t !== "gasto";
-    document.getElementById("sheetTitle").textContent = t === "gasto" ? "Nuevo gasto" : t === "ingreso" ? "Nuevo ingreso" : "Apartar ahorro";
+    document.getElementById("sheetTitle").textContent = titulo || (t === "gasto" ? "Nuevo gasto" : t === "ingreso" ? "Nuevo ingreso" : t === "ahorro" ? "Apartar ahorro" : "Pagar deuda");
+    renderSheetCats();
   }
 
   function openSheet(opts = {}) {
-    setTipo(opts.tipo || "gasto");
-    sheetCat = opts.cat || "gustos";
-    renderSheetCats();
-    document.getElementById("movMonto").value = opts.monto ? String(opts.monto) : "";
-    document.getElementById("movNota").value = "";
+    document.querySelector('[data-tipo="deuda"]').hidden = !state.deudas.some((d) => d.saldo > 0.005);
+    sheetSel = opts.sel || null;
+    setTipo(opts.tipo || "gasto", opts.titulo);
+    document.getElementById("movMonto").value = opts.monto ? String(round2(opts.monto)) : "";
+    document.getElementById("movNota").value = opts.nota || "";
     document.getElementById("movFecha").value = opts.fecha || defaultDate();
     document.getElementById("movError").hidden = true;
+    const hint = document.getElementById("movHint");
+    hint.hidden = !opts.hint; hint.innerHTML = opts.hint || "";
+    const quick = document.getElementById("movQuick");
+    quick.hidden = !(opts.quick && opts.quick.length);
+    quick.innerHTML = (opts.quick || []).map((q) => `<button type="button" class="chip" data-amount="${q.monto}">${esc(q.label)}</button>`).join("");
     if (typeof sheet.showModal === "function") sheet.showModal(); else sheet.setAttribute("open", "");
-    setTimeout(() => document.getElementById("movMonto").focus(), 50);
+    // El monto queda enfocado y seleccionado: lo que escribas reemplaza el número sugerido.
+    const amount = document.getElementById("movMonto");
+    amount.focus();
+    amount.select();
   }
   function closeSheet() { if (sheet.open) sheet.close ? sheet.close() : sheet.removeAttribute("open"); }
+
+  function payFijo(id) {
+    const m = monthView(current);
+    const p = m.presupuesto.find((x) => x.id === id);
+    if (!p) return;
+    const rest = round2(p.monto - (summary(m, current).spentBy[p.id] || 0));
+    if (rest <= 0) return;
+    openSheet({
+      tipo: "gasto", sel: p.id, monto: rest, nota: "Pago del mes", titulo: `Pagar ${p.nombre}`,
+      hint: `Faltan ${money(rest)}. Si vas a pagar solo una parte, cambia el monto.`,
+      quick: [{ label: `Todo ${money(rest)}`, monto: rest }, { label: `Mitad ${money(rest / 2)}`, monto: round2(rest / 2) }]
+    });
+  }
+
+  function payDeuda(id) {
+    const d = state.deudas.find((x) => x.id === id);
+    if (!d) return;
+    const { inicio, pagado } = deudasInicioMes();
+    const sim = simulate(inicio, presupuestoDeudas(inicio), state.estrategia);
+    const pend = Math.max(0, round2((sim.primerMes[id] || 0) - (pagado[id] || 0)));
+    const quick = [];
+    if (pend > 0) quick.push({ label: `Lo del plan ${money(pend)}`, monto: pend });
+    if (minDe(d) > 0 && Math.abs(minDe(d) - pend) > 0.5) quick.push({ label: `Mínimo ${money(minDe(d))}`, monto: minDe(d) });
+    quick.push({ label: `Todo ${money(d.saldo)}`, monto: d.saldo });
+    openSheet({
+      tipo: "deuda", sel: id, monto: pend || minDe(d), titulo: `Pagar ${d.nombre}`, fecha: todayISO(),
+      hint: `Debes ${money(d.saldo)}.${pend > 0 ? ` Según tu plan, este mes toca ${money(pend)}.` : ""} Puedes pagar más o menos.`,
+      quick
+    });
+  }
+
+  function saveToMeta(id) {
+    const meta = state.metas.find((x) => x.id === id);
+    if (!meta) return;
+    const info = metaInfo(meta, current);
+    const s = summary(monthView(current), current);
+    const monto = info.necesario > 0 ? Math.ceil(info.necesario) : Math.max(0, s.ahorroPlan - s.ahorro) || "";
+    openSheet({ tipo: "ahorro", sel: id, monto, titulo: `Apartar para ${meta.nombre}` });
+  }
 
   document.getElementById("fab").addEventListener("click", () => openSheet());
   document.getElementById("closeSheet").addEventListener("click", closeSheet);
   sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSheet(); });
-  document.querySelector(".seg").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) setTipo(b.dataset.tipo); });
+  document.querySelector(".seg").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) { sheetSel = null; setTipo(b.dataset.tipo); } });
   document.getElementById("movCats").addEventListener("click", (e) => {
     const b = e.target.closest("[data-cat]"); if (!b) return;
-    sheetCat = b.dataset.cat;
-    for (const c of document.querySelectorAll("#movCats [data-cat]")) c.setAttribute("aria-pressed", String(c.dataset.cat === sheetCat));
+    sheetSel = b.dataset.cat;
+    for (const c of document.querySelectorAll("#movCats [data-cat]")) c.setAttribute("aria-pressed", String(c.dataset.cat === sheetSel));
+  });
+  document.getElementById("movQuick").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-amount]"); if (!b) return;
+    document.getElementById("movMonto").value = b.dataset.amount;
   });
   document.getElementById("movForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const monto = parseAmount(document.getElementById("movMonto").value);
+    const monto = round2(parseAmount(document.getElementById("movMonto").value));
     if (!(monto > 0)) { document.getElementById("movError").hidden = false; return; }
     const fecha = document.getElementById("movFecha").value || defaultDate();
     const nota = document.getElementById("movNota").value.trim();
-    addMov({ tipo: sheetTipo, monto, cat: sheetTipo === "gasto" ? sheetCat : null, nota, fecha });
+    const mv = { tipo: sheetTipo, monto, nota, fecha };
+    if (sheetTipo === "gasto") mv.cat = sheetSel || "otros";
+    if (sheetTipo === "ahorro") mv.meta = sheetSel;
+    if (sheetTipo === "deuda") { if (!sheetSel) return; mv.deuda = sheetSel; }
+    const id = addMov(mv);
     closeSheet();
-    if (view !== "hoy") current = monthKeyOf(fecha);
+    if (view !== "hoy" && view !== "plan") current = monthKeyOf(fecha);
     render();
-    toast(sheetTipo === "gasto" ? `Gasto de ${money(monto)} guardado` : sheetTipo === "ingreso" ? `Ingreso de ${money(monto)} guardado` : `Apartaste ${money(monto)}`);
+    toast(sheetTipo === "gasto" ? `Gasto de ${money(monto)} guardado` : sheetTipo === "ingreso" ? `Ingreso de ${money(monto)} guardado` : sheetTipo === "ahorro" ? `Apartaste ${money(monto)}` : `Pagaste ${money(monto)}`, id);
   });
 
-  // Navegación
+  // Al tocar un campo de monto se selecciona todo, así lo que escribes reemplaza el número.
+  document.addEventListener("focusin", (e) => {
+    const t = e.target;
+    if (t.matches && t.matches('input[inputmode="decimal"]')) setTimeout(() => { try { t.setSelectionRange(0, t.value.length); } catch (err) { /* sin selección */ } }, 0);
+  });
+
+  /* ---------- Editor de metas y deudas ---------- */
+  const editor = document.getElementById("editor");
+  let edKind = null, edId = null;
+
+  const moneyField = (id, label, val, extra = "") => `<div class="field"><label for="${id}">${label}</label><div class="money"><input class="input" id="${id}" inputmode="decimal" placeholder="0" value="${numVal(val)}" /></div>${extra}</div>`;
+
+  function openEditor(kind, id) {
+    edKind = kind; edId = id || null;
+    let html = "";
+    if (kind === "meta") {
+      const x = state.metas.find((v) => v.id === id) || { nombre: "", objetivo: 0, fecha: "", base: 0 };
+      document.getElementById("edTitle").textContent = id ? "Editar meta" : "Nueva meta";
+      html = `<div class="field"><label for="edNombre">Nombre</label><input class="input" id="edNombre" maxlength="40" placeholder="Ej.: Viaje a Cusco" value="${esc(x.nombre)}" /></div>
+        ${moneyField("edObjetivo", "¿Cuánto necesitas?", x.objetivo)}
+        <div class="field"><label for="edFecha">¿Para cuándo? (opcional)</label><input class="input" id="edFecha" type="month" min="${thisMonth()}" value="${esc(x.fecha || "")}" /></div>
+        ${moneyField("edBase", "Ya tengo ahorrado para esto (opcional)", x.base)}`;
+    } else {
+      const x = state.deudas.find((v) => v.id === id) || { nombre: "", saldo: 0, tea: 0, minimo: 0 };
+      document.getElementById("edTitle").textContent = id ? "Editar deuda" : "Nueva deuda";
+      html = `<div class="field"><label for="edNombre">Nombre</label><input class="input" id="edNombre" maxlength="40" placeholder="Ej.: Tarjeta Visa" value="${esc(x.nombre)}" /></div>
+        ${moneyField("edSaldo", "¿Cuánto debes hoy?", x.saldo)}
+        <div class="field"><label for="edTea">Interés anual (TEA)</label><div class="pct"><input class="input" id="edTea" inputmode="decimal" placeholder="0" value="${numVal(x.tea)}" /></div><p class="hint" style="margin:0">Sale en tu estado de cuenta. Referencia: tarjetas 40–100%, préstamos personales 15–40%. Si es un préstamo sin interés, deja 0.</p></div>
+        ${moneyField("edMinimo", "Cuota mínima al mes", x.minimo)}`;
+    }
+    document.getElementById("edFields").innerHTML = html;
+    document.getElementById("edError").hidden = true;
+    const del = document.getElementById("edDelete");
+    del.hidden = !id; del.classList.remove("arm"); del.textContent = "Eliminar";
+    if (typeof editor.showModal === "function") editor.showModal(); else editor.setAttribute("open", "");
+  }
+  function closeEditor() { if (editor.open) editor.close ? editor.close() : editor.removeAttribute("open"); }
+
+  document.getElementById("edClose").addEventListener("click", closeEditor);
+  editor.addEventListener("click", (e) => { if (e.target === editor) closeEditor(); });
+  document.getElementById("edForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const err = (msg) => { const el = document.getElementById("edError"); el.textContent = msg; el.hidden = false; };
+    const nombre = document.getElementById("edNombre").value.trim();
+    if (!nombre) return err("Ponle un nombre.");
+    if (edKind === "meta") {
+      const objetivo = round2(parseAmount(document.getElementById("edObjetivo").value));
+      if (!(objetivo > 0)) return err("Escribe cuánto necesitas.");
+      const data = { nombre, objetivo, fecha: document.getElementById("edFecha").value || "", base: round2(parseAmount(document.getElementById("edBase").value)) };
+      if (edId) Object.assign(state.metas.find((v) => v.id === edId), data); else state.metas.push({ id: "m" + uid(), ...data });
+    } else {
+      const saldo = round2(parseAmount(document.getElementById("edSaldo").value));
+      if (!(saldo > 0)) return err("Escribe cuánto debes.");
+      const data = { nombre, saldo, tea: Math.max(0, parseAmount(document.getElementById("edTea").value)), minimo: round2(Math.max(0, parseAmount(document.getElementById("edMinimo").value))) };
+      if (edId) Object.assign(state.deudas.find((v) => v.id === edId), data); else state.deudas.push({ id: "d" + uid(), ...data });
+    }
+    save(); closeEditor(); render(); toast("Guardado");
+  });
+  document.getElementById("edDelete").addEventListener("click", (e) => {
+    const b = e.currentTarget;
+    if (!b.classList.contains("arm")) { b.classList.add("arm"); b.textContent = "Toca otra vez para eliminar"; return; }
+    if (edKind === "meta") state.metas = state.metas.filter((v) => v.id !== edId);
+    else state.deudas = state.deudas.filter((v) => v.id !== edId);
+    save(); closeEditor(); render(); toast("Eliminado");
+  });
+
+  /* ---------- Eventos de las vistas ---------- */
   document.querySelector(".tabs").addEventListener("click", (e) => {
     const b = e.target.closest("[data-tab]"); if (!b) return;
-    view = b.dataset.tab; if (view === "hoy") current = monthKeyOf(todayISO()); render(); window.scrollTo(0, 0);
+    view = b.dataset.tab; if (view === "hoy") current = thisMonth(); render(); window.scrollTo(0, 0);
   });
   document.getElementById("prevMonth").addEventListener("click", () => { current = shiftMonth(current, -1); render(); });
   document.getElementById("nextMonth").addEventListener("click", () => { current = shiftMonth(current, 1); render(); });
 
-  // Mi mes
-  document.getElementById("view-inicio").addEventListener("click", (e) => {
-    const pay = e.target.closest("[data-pay]");
-    if (pay) {
-      const m = monthView(current);
-      const p = m.presupuesto.find((x) => x.id === pay.dataset.pay);
-      const used = summary(m).spentBy[p.id] || 0;
-      const rest = Math.round((p.monto - used) * 100) / 100;
-      if (rest > 0) { addMov({ tipo: "gasto", monto: rest, cat: p.id, nota: "Pago del mes", fecha: defaultDate() }); render(); toast(`${p.nombre}: ${money(rest)} pagado`); }
-      return;
-    }
-    if (e.target.closest("[data-save]")) openSheet({ tipo: "ahorro", monto: state.ahorroMensual });
-  });
+  // Acciones compartidas entre vistas (botones con data-*).
   document.querySelector(".wrap").addEventListener("click", (e) => {
-    const go = e.target.closest("[data-go]");
-    if (go) { view = go.dataset.go; if (view === "hoy") current = monthKeyOf(todayISO()); render(); window.scrollTo(0, 0); }
+    const t = e.target.closest("button");
+    if (!t) return;
+    const d = t.dataset;
+    if (d.go) { view = d.go; if (view === "hoy") current = thisMonth(); render(); window.scrollTo(0, 0); }
+    else if (d.pay) payFijo(d.pay);
+    else if (d.undoFijo) {
+      const m = getMonth(current, false);
+      const last = m && [...m.movs].filter((x) => x.tipo === "gasto" && x.cat === d.undoFijo).sort((a, b) => a.id.localeCompare(b.id)).pop();
+      if (last) { removeMov(last.id); render(); toast(`Se deshizo el pago de ${money(last.monto)}`); }
+    }
+    else if (d.payDeuda) payDeuda(d.payDeuda);
+    else if (d.save) { const s = summary(monthView(current), current); openSheet({ tipo: "ahorro", sel: defaultMetaId(), monto: Math.max(0, s.ahorroPlan - s.ahorro) }); }
+    else if (d.metaSave) saveToMeta(d.metaSave);
+    else if (d.editMeta) openEditor("meta", d.editMeta);
+    else if (d.newMeta) openEditor("meta");
+    else if (d.editDeuda) openEditor("deuda", d.editDeuda);
+    else if (d.newDeuda) openEditor("deuda");
+    else if (d.estrategia) { state.estrategia = d.estrategia; save(); render(); }
+    else if (d.act === "crearFondo") {
+      const fijos = summary(monthView(current), current).fijosTotal;
+      if (!state.metas.some(esFondo)) state.metas.unshift({ id: "fondo", nombre: "Fondo de emergencia", objetivo: round2(fijos * 3), fecha: "", base: 0 });
+      save(); view = "plan"; render(); toast("Meta creada");
+    }
+    else if (d.act === "usarSugerido") { getMonth(current, true).ahorroPlan = sugeridoAhorro(current); save(); render(); toast("Plan de ahorro actualizado"); }
   });
 
-  // Movimientos: borrar con confirmación en dos toques
+  document.getElementById("view-hoy").addEventListener("click", (e) => {
+    const q = e.target.closest("[data-quick]");
+    if (q) { current = thisMonth(); openSheet({ tipo: "gasto", sel: q.dataset.quick, fecha: todayISO() }); return; }
+    if (e.target.closest("[data-close]")) {
+      state.cierres[todayISO()] = true; save(); render();
+      const n = streak();
+      toast(n > 1 ? `Día cerrado. Llevas ${n} días seguidos` : "Día cerrado");
+      return;
+    }
+    if (e.target.closest("[data-reopen]")) { delete state.cierres[todayISO()]; save(); render(); }
+  });
+
+  document.getElementById("view-plan").addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.id === "planAhorroMes") { const m = getMonth(current, true); if (t.value.trim() === "") delete m.ahorroPlan; else m.ahorroPlan = round2(Math.max(0, parseAmount(t.value))); }
+    else if (t.id === "ahorroDefault") state.ahorroMensual = round2(Math.max(0, parseAmount(t.value)));
+    else if (t.id === "deudaPresupuesto") state.deudaPresupuesto = round2(Math.max(0, parseAmount(t.value)));
+    else return;
+    save(); render(); toast("Guardado");
+  });
+
+  // Historial: borrar con confirmación en dos toques
   let armed = null, armTimer;
   document.getElementById("view-movimientos").addEventListener("click", (e) => {
     const b = e.target.closest("[data-del]"); if (!b) return;
@@ -871,15 +1416,14 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       clearTimeout(armTimer); armTimer = setTimeout(() => { armed = null; render(); }, 3000);
       return;
     }
-    const m = getMonth(current, false);
-    if (m) { m.movs = m.movs.filter((x) => x.id !== armed); save(); }
+    removeMov(armed);
     armed = null; clearTimeout(armTimer); render(); toast("Movimiento borrado");
   });
 
   // Ajustes
   function applyFijosToCurrent() {
     const m = getMonth(current, true);
-    const spent = summary(m).spentBy;
+    const spent = summary(m, current).spentBy;
     const kept = m.presupuesto.filter((p) => state.fijos.some((f) => f.id === p.id) || spent[p.id]);
     m.presupuesto = state.fijos.map((f) => ({ ...f })).concat(kept.filter((p) => !state.fijos.some((f) => f.id === p.id)));
   }
@@ -888,8 +1432,6 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
   ajustes.addEventListener("change", (e) => {
     const t = e.target;
     if (t.id === "ingresoMes") { getMonth(current, true).ingreso = Math.max(0, parseAmount(t.value)); state.ingresoBase = getMonth(current, true).ingreso; }
-    else if (t.id === "metaFondo") state.metaFondo = Math.max(0, parseAmount(t.value));
-    else if (t.id === "ahorroMensual") state.ahorroMensual = Math.max(0, parseAmount(t.value));
     else if (t.dataset.fname) { const f = state.fijos.find((x) => x.id === t.dataset.fname); if (f) f.nombre = t.value.trim() || f.nombre; applyFijosToCurrent(); }
     else if (t.dataset.fmonto) { const f = state.fijos.find((x) => x.id === t.dataset.fmonto); if (f) f.monto = Math.max(0, parseAmount(t.value)); applyFijosToCurrent(); }
     else return;
@@ -905,21 +1447,13 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       state.fijos.push({ id, nombre: "Nuevo gasto", monto: 0 });
       applyFijosToCurrent(); save(); render();
       const inp = document.getElementById("fn-" + id); if (inp) { inp.focus(); inp.select(); }
-    } else if (t.id === "enablePush") {
-      enablePush();
-    } else if (t.id === "testPush") {
-      testPush();
-    } else if (t.id === "copyPush") {
-      const ta = document.getElementById("pushCode");
-      try { await navigator.clipboard.writeText(ta.value); toast("Código copiado"); }
-      catch (err) { ta.select(); toast("Selecciona y copia el código"); }
     } else if (t.id === "copyBackup") {
       const text = JSON.stringify(state);
       try { await navigator.clipboard.writeText(text); toast("Respaldo copiado"); }
       catch (err) { const ta = document.getElementById("restoreText"); ta.value = text; ta.select(); toast("Selecciona y copia el texto"); }
     } else if (t.id === "downloadCsv") {
-      const rows = [["fecha", "tipo", "categoria", "monto", "nota"]];
-      for (const [key, m] of Object.entries(state.meses).sort()) for (const mv of m.movs) rows.push([mv.fecha, mv.tipo, mv.tipo === "gasto" ? catName(m, mv.cat) : "", String(mv.monto), mv.nota || ""]);
+      const rows = [["fecha", "tipo", "detalle", "monto", "nota"]];
+      for (const [, m] of Object.entries(state.meses).sort()) for (const mv of m.movs) rows.push([mv.fecha, mv.tipo, movLabel(m, mv), String(mv.monto), mv.nota || ""]);
       const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" }));
@@ -930,7 +1464,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
       try {
         const data = JSON.parse(document.getElementById("restoreText").value);
         if (!data || data.version !== 1 || !Array.isArray(data.fijos) || typeof data.meses !== "object") throw new Error("formato");
-        state = data; save(); render(); toast("Respaldo restaurado");
+        state = migrate(data); save(); render(); toast("Respaldo restaurado");
       } catch (err) { toast("Ese texto no es un respaldo válido"); }
     } else if (t.id === "resetBtn") {
       if (!t.classList.contains("arm")) { t.classList.add("arm"); t.textContent = "Toca otra vez para borrar"; setTimeout(() => { t.classList.remove("arm"); t.textContent = "Borrar todo"; }, 3000); return; }
@@ -938,6 +1472,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     }
   });
 
+  save();
   render();
   if (pendingToast) toast(pendingToast);
 
