@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Sol a Sol</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Tus ingresos, gastos fijos y ahorro del mes en una sola pantalla." />
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#11141a" media="(prefers-color-scheme: dark)" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Sol a Sol" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+/* Layout: una columna tipo libreta de bolsillo, cifra grande arriba, barra de pestañas abajo y botón + flotante. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --ink: #161b26;
+  --muted: #5e6675;
+  --line: #e2e5eb;
+  --accent: #a3741a;
+  --accent-soft: #f6ecd6;
+  --on-accent: #ffffff;
+  --good: #24835a;
+  --warn: #b96a0c;
+  --bad: #c23b33;
+  --bar-paid: #161b26;
+  --bar-pending: #8b93a3;
+  --bar-extra: #c23b33;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11141a; --surface: #1a1f28; --ink: #eceef3; --muted: #9aa2b1; --line: #2a303b;
+    --accent: #e3b456; --accent-soft: #3a2f18; --on-accent: #1a1406;
+    --good: #5cc98d; --warn: #f0a547; --bad: #f2786f;
+    --bar-paid: #eceef3; --bar-pending: #5f6878; --bar-extra: #f2786f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11141a; --surface: #1a1f28; --ink: #eceef3; --muted: #9aa2b1; --line: #2a303b;
+  --accent: #e3b456; --accent-soft: #3a2f18; --on-accent: #1a1406;
+  --good: #5cc98d; --warn: #f0a547; --bad: #f2786f;
+  --bar-paid: #eceef3; --bar-pending: #5f6878; --bar-extra: #f2786f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--body);
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+.wrap { max-width: 520px; margin: 0 auto; padding-block: 12px 140px; display: grid; gap: 20px; }
+[data-view] { display: grid; gap: 24px; min-width: 0; }
+
+/* Encabezado */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 18px/1 var(--display); letter-spacing: -0.01em; }
+.coin { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font: 700 12px/1 var(--display); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--on-accent) 25%, transparent); }
+.month { display: flex; align-items: center; gap: 2px; }
+.month button { width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; font-size: 18px; color: var(--muted); }
+.month button:hover { background: var(--surface); color: var(--ink); }
+.month span { min-width: 112px; text-align: center; font-weight: 600; }
+.month span::first-letter { text-transform: uppercase; }
+
+/* Cifra principal */
+.hero { display: grid; gap: 6px; padding-top: 8px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.big { font: 700 clamp(44px, 13vw, 64px)/1 var(--display); letter-spacing: -0.03em; margin: 0; font-variant-numeric: tabular-nums; }
+.big.neg { color: var(--bad); }
+.big small { font-size: 0.45em; font-weight: 500; color: var(--muted); margin-right: 4px; letter-spacing: 0; }
+.sub { margin: 0; color: var(--muted); }
+.sub b { color: var(--ink); font-weight: 600; }
+
+.stack { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: var(--line); margin-top: 10px; }
+.stack i { display: block; height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend span::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+
+/* Pistas */
+.tips { display: grid; gap: 8px; }
+.tip { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
+.tip .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; background: var(--c, var(--accent)); }
+.tip p { margin: 0; min-width: 0; }
+
+/* Secciones */
+.section { display: grid; gap: 10px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.section-head h2 { margin: 0; font: 700 19px/1.2 var(--display); letter-spacing: -0.01em; }
+.section-head span { color: var(--muted); font-size: 13px; }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.row .name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.row .meta { grid-column: 1; font-size: 13px; color: var(--muted); }
+.row .amt { font-family: var(--mono); font-size: 14px; font-variant-numeric: tabular-nums; text-align: right; }
+.row .side { grid-row: 1 / span 2; justify-content: flex-end; grid-column: 2; display: flex; align-items: center; gap: 10px; }
+.meter { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--bar-paid); }
+.meter.over i { background: var(--bad); }
+.pill { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.pill:hover { border-color: var(--ink); }
+.pill.done { border-color: transparent; background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); cursor: default; }
+.pill.danger { color: var(--bad); }
+.pill.arm { background: var(--bad); color: var(--surface); border-color: var(--bad); }
+
+/* Ahorro */
+.goal { background: var(--accent-soft); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; }
+.goal h2 { margin: 0; font: 700 19px/1.2 var(--display); }
+.goal p { margin: 0; font-size: 14px; color: var(--muted); }
+.goal .line { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.goal .line b { font: 700 24px/1 var(--display); font-variant-numeric: tabular-nums; }
+.goal .meter { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.goal .meter i { background: var(--accent); }
+.btn { border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 600; background: var(--ink); color: var(--bg); }
+.btn.accent { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+.btn.block { width: 100%; }
+
+/* Movimientos */
+.day { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 6px 2px 0; }
+.amt.in { color: var(--good); }
+.amt.save { color: var(--accent); }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
+.empty b { display: block; color: var(--ink); font: 700 17px/1.3 var(--display); margin-bottom: 4px; }
+.cats { display: grid; gap: 8px; }
+.cat { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: center; font-size: 13px; }
+.cat span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat .meter { grid-column: auto; height: 8px; border-radius: 4px; }
+
+/* Ajustes */
+.field { display: grid; gap: 6px; }
+.field label, .label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.input { width: 100%; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 12px; }
+.input:focus { border-color: var(--accent); outline: none; }
+.money { position: relative; }
+.money::before { content: "S/"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.money .input { padding-left: 34px; font-variant-numeric: tabular-nums; }
+.fixed-row { display: grid; grid-template-columns: 1fr 110px 40px; gap: 8px; align-items: center; }
+.icon-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 18px; line-height: 1; }
+.icon-btn:hover { color: var(--bad); border-color: var(--bad); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 14px; }
+.card h3 { margin: 0; font: 700 16px/1.2 var(--display); }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+textarea.input { min-height: 90px; resize: vertical; font-family: var(--mono); font-size: 12px; }
+
+/* Barra inferior */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding: 6px max(16px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.tabs div { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabs button { border: 0; background: transparent; display: grid; justify-items: center; gap: 2px; padding: 6px 0; font-size: 12px; font-weight: 600; color: var(--muted); }
+.tabs button svg { width: 22px; height: 22px; }
+.tabs button[aria-current="page"] { color: var(--ink); }
+.fab { position: fixed; z-index: 7; right: max(20px, calc(env(safe-area-inset-right, 0px) + 20px)); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); width: 60px; height: 60px; border-radius: 50%; border: 0; background: var(--accent); color: var(--on-accent); font: 400 34px/1 var(--display); box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 40%, transparent); }
+@media (min-width: 600px) { .fab { right: calc(50% - 260px); } }
+
+/* Hoja para registrar */
+dialog { border: 0; padding: 0; background: transparent; max-width: none; max-height: none; width: 100%; height: 100%; margin: 0; }
+dialog::backdrop { background: rgb(8 10 14 / 0.5); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-width: 520px; margin: 0 auto; background: var(--surface); color: var(--ink); border-radius: 22px 22px 0 0; padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 16px; max-height: 92%; overflow-y: auto; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; }
+.sheet-head h2 { margin: 0; font: 700 20px/1 var(--display); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 0; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / 0.12); }
+.amount-input { position: relative; }
+.amount-input span { position: absolute; left: 0; top: 50%; transform: translateY(-50%); font: 500 26px/1 var(--display); color: var(--muted); }
+.amount-input input { width: 100%; border: 0; border-bottom: 2px solid var(--line); background: transparent; padding: 6px 0 8px 46px; font: 700 44px/1.1 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.amount-input input:focus { outline: none; border-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 7px 13px; font-size: 14px; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.error { color: var(--bad); font-size: 13px; margin: -6px 0 0; }
+
+/* Cierre del día */
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.week div { display: grid; justify-items: center; gap: 6px; font-size: 12px; color: var(--muted); text-transform: capitalize; }
+.week i { width: 30px; height: 30px; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-style: normal; font-size: 14px; font-weight: 700; }
+.week .on i { border: 0; background: var(--good); color: var(--surface); }
+.week .today i { border-color: var(--accent); border-style: solid; }
+.week .today { color: var(--ink); font-weight: 600; }
+.streak { display: inline-flex; align-items: center; gap: 8px; align-self: start; justify-self: start; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); font-weight: 600; font-size: 14px; }
+.streak b { font: 700 18px/1 var(--display); color: var(--accent); }
+.closed { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: var(--radius); background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); font-weight: 600; }
+.banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: var(--radius); background: var(--ink); color: var(--bg); }
+.banner p { margin: 0; min-width: 0; font-weight: 600; }
+.banner .btn { background: var(--accent); color: var(--on-accent); padding: 9px 14px; flex: none; }
+.steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+.steps b { color: var(--ink); }
+.status { font-size: 13px; font-weight: 600; }
+.status.ok { color: var(--good); }
+.status.warn { color: var(--warn); }
+
+.toast { position: fixed; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; z-index: 20; white-space: nowrap; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .stack i, .meter i { transition: width 0.35s ease; }
+  .toast { animation: rise 0.2s ease; }
+  @keyframes rise { from { transform: translate(-50%, 8px); opacity: 0.4; } }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="coin" aria-hidden="true">S/</div>Sol a Sol</div>
+  <div class="month">
+    <button id="prevMonth" aria-label="Mes anterior">‹</button>
+    <span id="monthLabel">octubre 2026</span>
+    <button id="nextMonth" aria-label="Mes siguiente">›</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="view-inicio" data-view="inicio"></section>
+  <section id="view-hoy" data-view="hoy" hidden></section>
+  <section id="view-movimientos" data-view="movimientos" hidden></section>
+  <section id="view-ajustes" data-view="ajustes" hidden></section>
+</main>
+
+<button class="fab" id="fab" aria-label="Registrar movimiento">+</button>
+
+<nav class="tabs" aria-label="Secciones">
+  <div>
+    <button data-tab="inicio" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.5 9.8c0-1.1 1.1-1.8 2.5-1.8s2.5.7 2.5 1.8c0 2.6-5 1.6-5 4.3 0 1.1 1.1 1.9 2.5 1.9s2.5-.8 2.5-1.9"/></svg>
+      Mi mes
+    </button>
+    <button data-tab="hoy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      Hoy
+    </button>
+    <button data-tab="movimientos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h9"/></svg>
+      Movimientos
+    </button>
+    <button data-tab="ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      Ajustes
+    </button>
+  </div>
+</nav>
+
+<dialog id="sheet" aria-labelledby="sheetTitle">
+  <form class="sheet" id="movForm" novalidate>
+    <div class="sheet-head">
+      <h2 id="sheetTitle">Registrar</h2>
+      <button type="button" class="pill" id="closeSheet">Cerrar</button>
+    </div>
+    <div class="seg" role="group" aria-label="Tipo de movimiento">
+      <button type="button" data-tipo="gasto" aria-pressed="true">Gasto</button>
+      <button type="button" data-tipo="ingreso" aria-pressed="false">Ingreso</button>
+      <button type="button" data-tipo="ahorro" aria-pressed="false">Ahorro</button>
+    </div>
+    <div class="amount-input">
+      <span>S/</span>
+      <input id="movMonto" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Monto" />
+    </div>
+    <p class="error" id="movError" hidden>Escribe un monto mayor a cero.</p>
+    <div class="field" id="catField">
+      <span class="label">¿En qué?</span>
+      <div class="chips" id="movCats"></div>
+    </div>
+    <div class="two">
+      <div class="field">
+        <label for="movNota">Nota</label>
+        <input class="input" id="movNota" maxlength="60" placeholder="Opcional" />
+      </div>
+      <div class="field">
+        <label for="movFecha">Fecha</label>
+        <input class="input" id="movFecha" type="date" />
+      </div>
+    </div>
+    <button class="btn accent block" type="submit">Guardar</button>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const STORE_KEY = "solasol-v1";
+  const EXTRA_CATS = [
+    { id: "gustos", nombre: "Gustos" },
+    { id: "imprevistos", nombre: "Imprevistos" },
+    { id: "otros", nombre: "Otros" }
+  ];
+
+  // Datos iniciales: vacíos en el código público. Los datos personales llegan con el link #importar=…
+  const DEFAULT_SEED = window.SOLASOL_SEED || { ingresoBase: 0, fijos: [], metaFondo: 0, ahorroMensual: 0 };
+
+  // Llave pública para las notificaciones (la privada vive como secreto en GitHub).
+  const VAPID_PUBLIC = "BEwX7EESkmP3TXC7THZ8xIxZaopBEo3n4N_y-p8T74UsLOw52w917NFBP7uPbT2x5eCuhWjaKjKkdvZMhhjGukE";
+  const SECRETS_URL = "https://github.com/RenzoMoran9/sol-a-sol/settings/secrets/actions";
+
+  const fmtInt = new Intl.NumberFormat("es-PE", { maximumFractionDigits: 0 });
+  const fmtDec = new Intl.NumberFormat("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmt = { format: (n) => { const r = Math.round(n * 100) / 100; return Number.isInteger(r) ? fmtInt.format(r) : fmtDec.format(r); } };
+  const money = (n) => (n < 0 ? "−S/ " : "S/ ") + fmt.format(Math.abs(n));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  const pad = (n) => String(n).padStart(2, "0");
+  const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+  const monthKeyOf = (iso) => iso.slice(0, 7);
+  const parseAmount = (s) => { const n = parseFloat(String(s).replace(/\s/g, "").replace(",", ".")); return Number.isFinite(n) ? n : 0; };
+
+  function seed() {
+    return {
+      version: 1,
+      ingresoBase: DEFAULT_SEED.ingresoBase || 0,
+      fijos: (DEFAULT_SEED.fijos || []).map((f) => ({ ...f })),
+      metaFondo: DEFAULT_SEED.metaFondo || 0,
+      ahorroMensual: DEFAULT_SEED.ahorroMensual || 0,
+      meses: {},
+      cierres: {}
+    };
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && data.version === 1 && Array.isArray(data.fijos)) { data.cierres = data.cierres || {}; return data; }
+      }
+    } catch (e) { /* almacenamiento no disponible: se usa la semilla en memoria */ }
+    return seed();
+  }
+
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* sin almacenamiento */ }
+  }
+
+  let state = load();
+  let current = monthKeyOf(todayISO());
+  let view = "inicio";
+  let pendingToast = "";
+
+  // Link de configuración: #importar=<base64url de {ingresoBase, fijos, metaFondo, ahorroMensual}>.
+  // Solo se aplica si todavía no hay movimientos, para no pisar datos reales.
+  (function importFromHash() {
+    const m = location.hash.match(/^#importar=([A-Za-z0-9_-]+)$/);
+    if (!m) return;
+    try {
+      const b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
+      const json = decodeURIComponent(escape(atob(b64)));
+      const cfg = JSON.parse(json);
+      const hasMovs = Object.values(state.meses).some((x) => x.movs.length);
+      if (hasMovs) { pendingToast = "Ya tienes movimientos: no se importó nada"; }
+      else if (Array.isArray(cfg.fijos)) {
+        state.ingresoBase = Number(cfg.ingresoBase) || 0;
+        state.fijos = cfg.fijos.map((f) => ({ id: String(f.id), nombre: String(f.nombre), monto: Number(f.monto) || 0 }));
+        state.metaFondo = Number(cfg.metaFondo) || 0;
+        state.ahorroMensual = Number(cfg.ahorroMensual) || 0;
+        state.meses = {};
+        save();
+        pendingToast = "Tus datos se cargaron";
+      }
+    } catch (e) { pendingToast = "El link de configuración no es válido"; }
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { /* sin historial */ }
+  })();
+
+  if (/[?&]cierre=1/.test(location.search) || location.hash === "#hoy") view = "hoy";
+
+  function getMonth(key, create) {
+    if (!state.meses[key] && create) {
+      state.meses[key] = {
+        ingreso: state.ingresoBase,
+        presupuesto: state.fijos.map((f) => ({ ...f })),
+        movs: []
+      };
+    }
+    return state.meses[key] || null;
+  }
+
+  // Si el mes no existe aún se muestra como plantilla, sin guardarlo hasta que haya un cambio.
+  function monthView(key) {
+    return getMonth(key, false) || { ingreso: state.ingresoBase, presupuesto: state.fijos.map((f) => ({ ...f })), movs: [], virtual: true };
+  }
+
+  function summary(m) {
+    const spentBy = {};
+    let ingresosExtra = 0, ahorro = 0, gastado = 0;
+    for (const mv of m.movs) {
+      if (mv.tipo === "gasto") { spentBy[mv.cat] = (spentBy[mv.cat] || 0) + mv.monto; gastado += mv.monto; }
+      else if (mv.tipo === "ingreso") ingresosExtra += mv.monto;
+      else if (mv.tipo === "ahorro") ahorro += mv.monto;
+    }
+    const budgetIds = new Set(m.presupuesto.map((p) => p.id));
+    let fijosTotal = 0, fijosPagado = 0, comprometido = 0, excesoFijos = 0;
+    for (const p of m.presupuesto) {
+      const used = spentBy[p.id] || 0;
+      fijosTotal += p.monto;
+      fijosPagado += Math.min(used, p.monto);
+      excesoFijos += Math.max(0, used - p.monto);
+      comprometido += Math.max(used, p.monto);
+    }
+    let extra = 0;
+    for (const [cat, v] of Object.entries(spentBy)) if (!budgetIds.has(cat)) extra += v;
+    const ingresos = m.ingreso + ingresosExtra;
+    const libre = ingresos - comprometido - extra - ahorro;
+    return { spentBy, ingresos, ingresosExtra, ahorro, gastado, fijosTotal, fijosPagado, fijosPendiente: fijosTotal - fijosPagado, excesoFijos, extra, libre };
+  }
+
+  function totalAhorrado() {
+    let t = 0;
+    for (const m of Object.values(state.meses)) for (const mv of m.movs) if (mv.tipo === "ahorro") t += mv.monto;
+    return t;
+  }
+
+  function monthName(key, withYear = true) {
+    const [y, mo] = key.split("-").map(Number);
+    const name = new Date(y, mo - 1, 1).toLocaleDateString("es-PE", { month: "long" });
+    return withYear ? `${name} ${y}` : name;
+  }
+
+  function shiftMonth(key, delta) {
+    const [y, mo] = key.split("-").map(Number);
+    const d = new Date(y, mo - 1 + delta, 1);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  }
+
+  function catName(m, id) {
+    const p = m.presupuesto.find((x) => x.id === id) || state.fijos.find((x) => x.id === id) || EXTRA_CATS.find((x) => x.id === id);
+    return p ? p.nombre : "Otros";
+  }
+
+  /* ---------- Vista: Mi mes ---------- */
+  function renderInicio() {
+    const m = monthView(current);
+    const s = summary(m);
+    const mes = monthName(current, false);
+    const pct = (v) => s.ingresos > 0 ? Math.max(0, (v / s.ingresos) * 100) : 0;
+    const libreBar = Math.max(0, s.libre);
+
+    const tips = [];
+    const ratio = s.ingresos > 0 ? s.fijosTotal / s.ingresos : 0;
+    if (ratio >= 0.7) tips.push({ c: "var(--warn)", t: `Tus gastos fijos se llevan el <b>${Math.round(ratio * 100)}%</b> de lo que entra. Lo sano es que no pasen del 50–60%. Revisa cuál puedes bajar.` });
+    if (s.libre < 0) tips.push({ c: "var(--bad)", t: `Este mes vas <b>${money(-s.libre)}</b> por encima de lo que entró. Frena los gustos hasta el próximo ingreso.` });
+    else if (s.ahorro === 0 && s.libre >= state.ahorroMensual) tips.push({ c: "var(--accent)", t: `Págate primero: aparta <b>${money(state.ahorroMensual)}</b> apenas cobres y vive con el resto.` });
+    if (s.excesoFijos > 0) tips.push({ c: "var(--bad)", t: `Te pasaste <b>${money(s.excesoFijos)}</b> en tus gastos fijos. Revisa cuáles están en rojo.` });
+    if (s.extra > 0) tips.push({ c: "var(--muted)", t: `Llevas <b>${money(s.extra)}</b> en gastos fuera de tu lista fija.` });
+
+    const fijosRows = m.presupuesto.map((p) => {
+      const used = s.spentBy[p.id] || 0;
+      const saldo = p.monto - used;
+      const done = used >= p.monto;
+      const w = p.monto > 0 ? Math.min(100, (used / p.monto) * 100) : 100;
+      const meta = used === 0 ? `${money(p.monto)} por pagar` : saldo > 0 ? `${money(used)} de ${money(p.monto)} · quedan ${money(saldo)}` : saldo < 0 ? `Te pasaste ${money(-saldo)}` : "Pagado completo";
+      return `<div class="row">
+        <span class="name">${esc(p.nombre)}</span>
+        <div class="side">
+          <span class="amt">${money(p.monto)}</span>
+          ${done ? `<span class="pill done">Listo</span>` : `<button class="pill" data-pay="${esc(p.id)}">Pagar</button>`}
+        </div>
+        <span class="meta">${meta}</span>
+        <div class="meter${saldo < 0 ? " over" : ""}"><i style="width:${w}%"></i></div>
+      </div>`;
+    }).join("");
+
+    const ahorrado = totalAhorrado();
+    const meta = state.metaFondo || 0;
+    const goalPct = meta > 0 ? Math.min(100, (ahorrado / meta) * 100) : 0;
+    const faltan = Math.max(0, meta - ahorrado);
+    const meses = state.ahorroMensual > 0 ? Math.ceil(faltan / state.ahorroMensual) : 0;
+
+    const now = new Date();
+    const needsClose = current === monthKeyOf(todayISO()) && now.getHours() >= 19 && !state.cierres[todayISO()];
+    const isEmpty = !state.fijos.length && !m.ingreso && !m.movs.length;
+
+    document.getElementById("view-inicio").innerHTML = `
+      ${needsClose ? `<div class="banner"><p>Te falta el cierre de hoy</p><button class="btn" data-go="hoy">Hacerlo ahora</button></div>` : ""}
+      ${isEmpty ? `<div class="empty"><b>Empieza por tu ingreso y tus gastos fijos</b>Ponlos en Ajustes. Con eso la app calcula cuánto te queda libre cada mes.<br><br><button class="btn" data-go="ajustes">Ir a Ajustes</button></div>` : ""}
+      <div class="hero">
+        <p class="eyebrow">Libre para gastar en ${esc(mes)}</p>
+        <p class="big${s.libre < 0 ? " neg" : ""}"><small>S/</small>${s.libre < 0 ? "−" : ""}${fmt.format(Math.abs(s.libre))}</p>
+        <p class="sub">Entraron <b class="num">${money(s.ingresos)}</b> · fijos <b class="num">${money(s.fijosTotal)}</b>${s.ahorro ? ` · ahorro <b class="num">${money(s.ahorro)}</b>` : ""}</p>
+        <div class="stack" role="img" aria-label="Reparto del ingreso del mes">
+          <i style="width:${pct(s.fijosPagado)}%;background:var(--bar-paid)"></i>
+          <i style="width:${pct(s.fijosPendiente + s.excesoFijos)}%;background:var(--bar-pending)"></i>
+          <i style="width:${pct(s.extra)}%;background:var(--bar-extra)"></i>
+          <i style="width:${pct(s.ahorro)}%;background:var(--accent)"></i>
+          <i style="width:${pct(libreBar)}%;background:var(--good)"></i>
+        </div>
+        <div class="legend">
+          <span style="--c:var(--bar-paid)">Pagado</span>
+          <span style="--c:var(--bar-pending)">Por pagar</span>
+          <span style="--c:var(--bar-extra)">Otros</span>
+          <span style="--c:var(--accent)">Ahorro</span>
+          <span style="--c:var(--good)">Libre</span>
+        </div>
+      </div>
+
+      ${tips.length ? `<div class="tips">${tips.map((t) => `<div class="tip" style="--c:${t.c}"><span class="dot"></span><p>${t.t}</p></div>`).join("")}</div>` : ""}
+
+      <div class="section">
+        <div class="section-head"><h2>Gastos fijos</h2><span class="num">${money(s.fijosPagado)} de ${money(s.fijosTotal)} pagado</span></div>
+        <div class="list">${fijosRows || `<div class="row"><span class="meta">Agrega tus gastos fijos en Ajustes.</span></div>`}</div>
+      </div>
+
+      <div class="goal">
+        <div class="line"><h2>Fondo de emergencia</h2><b>${money(ahorrado)}</b></div>
+        <div class="meter"><i style="width:${goalPct}%"></i></div>
+        <p>${meta > 0 ? (faltan > 0 ? `Meta ${money(meta)} (unos 3 meses de tus gastos fijos). Faltan ${money(faltan)}${meses ? `: apartando ${money(state.ahorroMensual)} al mes llegas en ${meses} ${meses === 1 ? "mes" : "meses"}` : ""}.` : "Llegaste a tu meta. Ahora el ahorro puede ir a otro objetivo.") : "Define una meta en Ajustes."}</p>
+        <button class="btn accent" data-save="1">Apartar ${money(state.ahorroMensual)}</button>
+      </div>`;
+  }
+
+  /* ---------- Vista: Hoy (cierre del día) ---------- */
+  function addDays(iso, delta) {
+    const [y, mo, d] = iso.split("-").map(Number);
+    const x = new Date(y, mo - 1, d + delta);
+    return `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`;
+  }
+
+  function streak() {
+    const today = todayISO();
+    let day = state.cierres[today] ? today : addDays(today, -1);
+    let n = 0;
+    while (state.cierres[day]) { n++; day = addDays(day, -1); }
+    return n;
+  }
+
+  function renderHoy() {
+    const today = todayISO();
+    const m = monthView(monthKeyOf(today));
+    const movs = m.movs.filter((x) => x.fecha === today).sort((a, b) => b.id.localeCompare(a.id));
+    const gastos = movs.filter((x) => x.tipo === "gasto").reduce((a, x) => a + x.monto, 0);
+    const closed = !!state.cierres[today];
+    const n = streak();
+    const [y, mo, d] = today.split("-").map(Number);
+    const fecha = new Date(y, mo - 1, d).toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" });
+
+    const week = [];
+    for (let i = 6; i >= 0; i--) {
+      const iso = addDays(today, -i);
+      const [yy, mm, dd] = iso.split("-").map(Number);
+      const label = new Date(yy, mm - 1, dd).toLocaleDateString("es-PE", { weekday: "short" }).replace(".", "").slice(0, 2);
+      week.push(`<div class="${state.cierres[iso] ? "on" : ""}${iso === today ? " today" : ""}"><i>${state.cierres[iso] ? "✓" : ""}</i>${esc(label)}</div>`);
+    }
+
+    const cats = [...m.presupuesto, ...EXTRA_CATS];
+    const rows = movs.map((mv) => {
+      const label = mv.tipo === "gasto" ? catName(m, mv.cat) : mv.tipo === "ingreso" ? "Ingreso" : "Ahorro";
+      const cls = mv.tipo === "ingreso" ? " in" : mv.tipo === "ahorro" ? " save" : "";
+      return `<div class="row"><span class="name">${esc(label)}</span><div class="side"><span class="amt${cls}">${mv.tipo === "gasto" ? "−" : "+"} ${money(mv.monto)}</span></div><span class="meta">${mv.nota ? esc(mv.nota) : ""}</span></div>`;
+    }).join("");
+
+    document.getElementById("view-hoy").innerHTML = `
+      <div class="hero">
+        <p class="eyebrow">Cierre de hoy · ${esc(fecha)}</p>
+        <p class="big"><small>S/</small>${fmt.format(gastos)}</p>
+        <p class="sub">gastado hoy</p>
+      </div>
+      <div class="streak">${n ? `<b class="num">${n}</b> ${n === 1 ? "día seguido" : "días seguidos"} con tu cierre` : "Empieza tu racha hoy"}</div>
+      <div class="week" aria-label="Últimos 7 días">${week.join("")}</div>
+
+      <div class="section">
+        <div class="section-head"><h2>¿Qué gastaste hoy?</h2></div>
+        <div class="chips">${cats.map((c) => `<button class="chip" data-quick="${esc(c.id)}">${esc(c.nombre)}</button>`).join("")}</div>
+        ${movs.length ? `<div class="list">${rows}</div>` : `<div class="empty">Toca una categoría para anotar un gasto de hoy. Piensa en lo que pagaste en efectivo, Yape o tarjeta.</div>`}
+      </div>
+
+      ${closed
+        ? `<div class="closed"><span>Día cerrado. Buen trabajo.</span><button class="pill" data-reopen="1">Reabrir</button></div>`
+        : `<button class="btn accent block" data-close="1">${movs.length ? "Listo, cerrar el día" : "Hoy no gasté nada"}</button>`}`;
+  }
+
+  document.getElementById("view-hoy").addEventListener("click", (e) => {
+    const q = e.target.closest("[data-quick]");
+    if (q) { current = monthKeyOf(todayISO()); openSheet({ tipo: "gasto", cat: q.dataset.quick, fecha: todayISO() }); return; }
+    if (e.target.closest("[data-close]")) {
+      state.cierres[todayISO()] = true; save(); render();
+      const n = streak();
+      toast(n > 1 ? `Día cerrado. Llevas ${n} días seguidos` : "Día cerrado");
+      return;
+    }
+    if (e.target.closest("[data-reopen]")) { delete state.cierres[todayISO()]; save(); render(); }
+  });
+
+  /* ---------- Vista: Movimientos ---------- */
+  function renderMovimientos() {
+    const m = monthView(current);
+    const s = summary(m);
+    const movs = [...m.movs].sort((a, b) => (b.fecha + b.id).localeCompare(a.fecha + a.id));
+    const el = document.getElementById("view-movimientos");
+
+    const cats = Object.entries(s.spentBy).sort((a, b) => b[1] - a[1]);
+    const maxCat = cats.length ? cats[0][1] : 0;
+    const catHtml = cats.map(([id, v]) => `<div class="cat"><span>${esc(catName(m, id))}</span><div class="meter"><i style="width:${(v / maxCat) * 100}%"></i></div><span class="amt">${money(v)}</span></div>`).join("");
+
+    let html = `<div class="hero">
+      <p class="eyebrow">Gastado en ${esc(monthName(current, false))}</p>
+      <p class="big"><small>S/</small>${fmt.format(s.gastado)}</p>
+      <p class="sub">${m.movs.length} ${m.movs.length === 1 ? "movimiento" : "movimientos"} · ingresos extra <b class="num">${money(s.ingresosExtra)}</b> · ahorro <b class="num">${money(s.ahorro)}</b></p>
+    </div>`;
+
+    if (cats.length) html += `<div class="section"><div class="section-head"><h2>¿En qué se fue?</h2></div><div class="card cats">${catHtml}</div></div>`;
+
+    if (!movs.length) {
+      html += `<div class="empty"><b>Aún no hay movimientos este mes</b>Toca el botón + para registrar un gasto, un ingreso o un ahorro. Toma menos de 5 segundos.</div>`;
+    } else {
+      let lastDay = "";
+      html += `<div class="section">`;
+      let open = false;
+      for (const mv of movs) {
+        if (mv.fecha !== lastDay) {
+          if (open) html += `</div>`;
+          const [y, mo, d] = mv.fecha.split("-").map(Number);
+          html += `<p class="day">${esc(new Date(y, mo - 1, d).toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" }))}</p><div class="list">`;
+          open = true; lastDay = mv.fecha;
+        }
+        const label = mv.tipo === "gasto" ? catName(m, mv.cat) : mv.tipo === "ingreso" ? "Ingreso" : "Ahorro";
+        const cls = mv.tipo === "ingreso" ? " in" : mv.tipo === "ahorro" ? " save" : "";
+        const sign = mv.tipo === "gasto" ? "−" : "+";
+        html += `<div class="row">
+          <span class="name">${esc(label)}</span>
+          <div class="side"><span class="amt${cls}">${sign} ${money(mv.monto)}</span><button class="pill danger" data-del="${esc(mv.id)}">Borrar</button></div>
+          <span class="meta">${mv.nota ? esc(mv.nota) : ""}</span>
+        </div>`;
+      }
+      if (open) html += `</div>`;
+      html += `</div>`;
+    }
+    el.innerHTML = html;
+  }
+
+  /* ---------- Vista: Ajustes ---------- */
+  function renderAjustes() {
+    const m = monthView(current);
+    const fijosHtml = state.fijos.map((f) => `
+      <div class="fixed-row">
+        <input class="input" id="fn-${esc(f.id)}" data-fname="${esc(f.id)}" value="${esc(f.nombre)}" aria-label="Nombre del gasto fijo" />
+        <div class="money"><input class="input" id="fm-${esc(f.id)}" data-fmonto="${esc(f.id)}" inputmode="decimal" value="${f.monto}" aria-label="Monto de ${esc(f.nombre)}" /></div>
+        <button class="icon-btn" data-fdel="${esc(f.id)}" aria-label="Quitar ${esc(f.nombre)}">×</button>
+      </div>`).join("");
+    const totalFijos = state.fijos.reduce((a, f) => a + f.monto, 0);
+
+    document.getElementById("view-ajustes").innerHTML = `
+      <div class="hero"><p class="eyebrow">Ajustes</p><p class="sub">Los cambios aplican a <b>${esc(monthName(current))}</b> y a los meses que vienen. Los meses pasados no se tocan.</p></div>
+
+      <div class="card">
+        <h3>Ingreso del mes</h3>
+        <div class="field"><label for="ingresoMes">Lo que entra en ${esc(monthName(current, false))}</label><div class="money"><input class="input" id="ingresoMes" inputmode="decimal" value="${m.ingreso}" /></div></div>
+        <p>Si te entra algo extra (un cachuelo, un bono), regístralo con + como Ingreso.</p>
+      </div>
+
+      <div class="card">
+        <h3>Gastos fijos · <span class="num">${money(totalFijos)}</span></h3>
+        <div class="cats">${fijosHtml}</div>
+        <button class="btn ghost" id="addFijo">Agregar gasto fijo</button>
+      </div>
+
+      <div class="card">
+        <h3>Ahorro</h3>
+        <div class="two">
+          <div class="field"><label for="metaFondo">Meta del fondo</label><div class="money"><input class="input" id="metaFondo" inputmode="decimal" value="${state.metaFondo}" /></div></div>
+          <div class="field"><label for="ahorroMensual">Apartar al mes</label><div class="money"><input class="input" id="ahorroMensual" inputmode="decimal" value="${state.ahorroMensual}" /></div></div>
+        </div>
+        <p>Una buena meta es cubrir 3 meses de gastos fijos.</p>
+      </div>
+
+      <div class="card" id="notifCard">
+        <h3>Recordatorio de cada noche</h3>
+        ${notifHtml()}
+      </div>
+
+      <div class="card">
+        <h3>Respaldo</h3>
+        <p>Tus datos se guardan solo en este celular. Copia un respaldo de vez en cuando y guárdalo en tus notas o en Drive.</p>
+        <div class="btns">
+          <button class="btn ghost" id="copyBackup">Copiar respaldo</button>
+          <button class="btn ghost" id="downloadCsv">Descargar CSV</button>
+        </div>
+        <div class="field"><label for="restoreText">Restaurar desde un respaldo</label><textarea class="input" id="restoreText" placeholder="Pega aquí el texto del respaldo"></textarea></div>
+        <div class="btns">
+          <button class="btn ghost" id="restoreBtn">Restaurar</button>
+          <button class="pill danger" id="resetBtn">Borrar todo</button>
+        </div>
+      </div>`;
+  }
+
+  /* ---------- Notificaciones ---------- */
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  const pushSupported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window && location.protocol === "https:";
+
+  function notifHtml() {
+    if (isIOS && !isStandalone) return `<p>En iPhone las notificaciones funcionan con la app instalada. Toca <b>Compartir → Agregar a inicio</b>, abre Sol a Sol desde su ícono y vuelve aquí.</p>`;
+    if (!pushSupported) return `<p>Las notificaciones funcionan en la app instalada desde <b>renzomoran9.github.io/sol-a-sol</b>. Ábrela ahí en tu celular para activarlas.</p>`;
+    const perm = Notification.permission;
+    if (perm === "denied") return `<p class="status warn">Bloqueaste las notificaciones para esta app.</p><p>Actívalas en los ajustes del celular (Notificaciones → Sol a Sol) y vuelve aquí.</p>`;
+    if (!state.push) return `<p>Cada noche cerca de las 9 pm te llega un aviso para hacer el cierre del día.</p><button class="btn accent" id="enablePush">Activar notificaciones</button>`;
+    return `<p class="status ok">Notificaciones activadas en este celular.</p>
+      <p>Falta un paso, solo una vez: guardar este código en GitHub para que el aviso de las 9 pm sepa a qué celular llegar.</p>
+      <ol class="steps">
+        <li>Toca <b>Copiar código</b>.</li>
+        <li>Abre <a href="${SECRETS_URL}" target="_blank" rel="noopener">los secretos de tu repo sol-a-sol</a> y toca <b>New repository secret</b>.</li>
+        <li>Nombre: <b>PUSH_SUBSCRIPTION</b>. En Secret pega el código y guarda.</li>
+      </ol>
+      <textarea class="input" id="pushCode" readonly>${esc(JSON.stringify(state.push))}</textarea>
+      <div class="btns"><button class="btn" id="copyPush">Copiar código</button><button class="btn ghost" id="testPush">Probar aviso</button></div>`;
+  }
+
+  function urlB64ToUint8(b64) {
+    const pad64 = "=".repeat((4 - (b64.length % 4)) % 4);
+    const raw = atob((b64 + pad64).replace(/-/g, "+").replace(/_/g, "/"));
+    return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+  }
+
+  async function enablePush() {
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") { render(); return; }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(VAPID_PUBLIC) });
+      state.push = sub.toJSON(); save(); render();
+      toast("Notificaciones activadas");
+    } catch (e) {
+      toast("No se pudo activar. Revisa tu conexión e inténtalo otra vez");
+    }
+  }
+
+  async function testPush() {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("Sol a Sol", { body: "Así se verá tu recordatorio de cada noche.", icon: "icon-192.png", badge: "icon-192.png", data: { url: "./?cierre=1" } });
+    } catch (e) { toast("No se pudo mostrar el aviso"); }
+  }
+
+  function render() {
+    document.getElementById("monthLabel").textContent = monthName(current);
+    for (const sec of document.querySelectorAll("[data-view]")) sec.hidden = sec.dataset.view !== view;
+    for (const b of document.querySelectorAll("[data-tab]")) { if (b.dataset.tab === view) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); }
+    document.getElementById("fab").hidden = view === "ajustes" || view === "hoy";
+    if (view === "inicio") renderInicio();
+    else if (view === "hoy") renderHoy();
+    else if (view === "movimientos") renderMovimientos();
+    else renderAjustes();
+  }
+
+  /* ---------- Acciones ---------- */
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 2200);
+  }
+
+  function addMov(mv) {
+    const key = monthKeyOf(mv.fecha);
+    getMonth(key, true).movs.push({ id: uid(), ...mv });
+    save();
+  }
+
+  function defaultDate() {
+    const t = todayISO();
+    return monthKeyOf(t) === current ? t : `${current}-01`;
+  }
+
+  // Hoja de registro
+  const sheet = document.getElementById("sheet");
+  let sheetTipo = "gasto", sheetCat = null;
+
+  function renderSheetCats() {
+    const m = monthView(current);
+    const list = [...m.presupuesto, ...EXTRA_CATS];
+    if (!sheetCat || !list.some((c) => c.id === sheetCat)) sheetCat = "gustos";
+    document.getElementById("movCats").innerHTML = list.map((c) => `<button type="button" class="chip" data-cat="${esc(c.id)}" aria-pressed="${c.id === sheetCat}">${esc(c.nombre)}</button>`).join("");
+  }
+
+  function setTipo(t) {
+    sheetTipo = t;
+    for (const b of document.querySelectorAll("[data-tipo]")) b.setAttribute("aria-pressed", String(b.dataset.tipo === t));
+    document.getElementById("catField").hidden = t !== "gasto";
+    document.getElementById("sheetTitle").textContent = t === "gasto" ? "Nuevo gasto" : t === "ingreso" ? "Nuevo ingreso" : "Apartar ahorro";
+  }
+
+  function openSheet(opts = {}) {
+    setTipo(opts.tipo || "gasto");
+    sheetCat = opts.cat || "gustos";
+    renderSheetCats();
+    document.getElementById("movMonto").value = opts.monto ? String(opts.monto) : "";
+    document.getElementById("movNota").value = "";
+    document.getElementById("movFecha").value = opts.fecha || defaultDate();
+    document.getElementById("movError").hidden = true;
+    if (typeof sheet.showModal === "function") sheet.showModal(); else sheet.setAttribute("open", "");
+    setTimeout(() => document.getElementById("movMonto").focus(), 50);
+  }
+  function closeSheet() { if (sheet.open) sheet.close ? sheet.close() : sheet.removeAttribute("open"); }
+
+  document.getElementById("fab").addEventListener("click", () => openSheet());
+  document.getElementById("closeSheet").addEventListener("click", closeSheet);
+  sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSheet(); });
+  document.querySelector(".seg").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) setTipo(b.dataset.tipo); });
+  document.getElementById("movCats").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cat]"); if (!b) return;
+    sheetCat = b.dataset.cat;
+    for (const c of document.querySelectorAll("#movCats [data-cat]")) c.setAttribute("aria-pressed", String(c.dataset.cat === sheetCat));
+  });
+  document.getElementById("movForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const monto = parseAmount(document.getElementById("movMonto").value);
+    if (!(monto > 0)) { document.getElementById("movError").hidden = false; return; }
+    const fecha = document.getElementById("movFecha").value || defaultDate();
+    const nota = document.getElementById("movNota").value.trim();
+    addMov({ tipo: sheetTipo, monto, cat: sheetTipo === "gasto" ? sheetCat : null, nota, fecha });
+    closeSheet();
+    if (view !== "hoy") current = monthKeyOf(fecha);
+    render();
+    toast(sheetTipo === "gasto" ? `Gasto de ${money(monto)} guardado` : sheetTipo === "ingreso" ? `Ingreso de ${money(monto)} guardado` : `Apartaste ${money(monto)}`);
+  });
+
+  // Navegación
+  document.querySelector(".tabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-tab]"); if (!b) return;
+    view = b.dataset.tab; if (view === "hoy") current = monthKeyOf(todayISO()); render(); window.scrollTo(0, 0);
+  });
+  document.getElementById("prevMonth").addEventListener("click", () => { current = shiftMonth(current, -1); render(); });
+  document.getElementById("nextMonth").addEventListener("click", () => { current = shiftMonth(current, 1); render(); });
+
+  // Mi mes
+  document.getElementById("view-inicio").addEventListener("click", (e) => {
+    const pay = e.target.closest("[data-pay]");
+    if (pay) {
+      const m = monthView(current);
+      const p = m.presupuesto.find((x) => x.id === pay.dataset.pay);
+      const used = summary(m).spentBy[p.id] || 0;
+      const rest = Math.round((p.monto - used) * 100) / 100;
+      if (rest > 0) { addMov({ tipo: "gasto", monto: rest, cat: p.id, nota: "Pago del mes", fecha: defaultDate() }); render(); toast(`${p.nombre}: ${money(rest)} pagado`); }
+      return;
+    }
+    if (e.target.closest("[data-save]")) openSheet({ tipo: "ahorro", monto: state.ahorroMensual });
+  });
+  document.querySelector(".wrap").addEventListener("click", (e) => {
+    const go = e.target.closest("[data-go]");
+    if (go) { view = go.dataset.go; if (view === "hoy") current = monthKeyOf(todayISO()); render(); window.scrollTo(0, 0); }
+  });
+
+  // Movimientos: borrar con confirmación en dos toques
+  let armed = null, armTimer;
+  document.getElementById("view-movimientos").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-del]"); if (!b) return;
+    if (armed !== b.dataset.del) {
+      armed = b.dataset.del; b.textContent = "¿Seguro?"; b.classList.add("arm");
+      clearTimeout(armTimer); armTimer = setTimeout(() => { armed = null; render(); }, 3000);
+      return;
+    }
+    const m = getMonth(current, false);
+    if (m) { m.movs = m.movs.filter((x) => x.id !== armed); save(); }
+    armed = null; clearTimeout(armTimer); render(); toast("Movimiento borrado");
+  });
+
+  // Ajustes
+  function applyFijosToCurrent() {
+    const m = getMonth(current, true);
+    const spent = summary(m).spentBy;
+    const kept = m.presupuesto.filter((p) => state.fijos.some((f) => f.id === p.id) || spent[p.id]);
+    m.presupuesto = state.fijos.map((f) => ({ ...f })).concat(kept.filter((p) => !state.fijos.some((f) => f.id === p.id)));
+  }
+
+  const ajustes = document.getElementById("view-ajustes");
+  ajustes.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.id === "ingresoMes") { getMonth(current, true).ingreso = Math.max(0, parseAmount(t.value)); state.ingresoBase = getMonth(current, true).ingreso; }
+    else if (t.id === "metaFondo") state.metaFondo = Math.max(0, parseAmount(t.value));
+    else if (t.id === "ahorroMensual") state.ahorroMensual = Math.max(0, parseAmount(t.value));
+    else if (t.dataset.fname) { const f = state.fijos.find((x) => x.id === t.dataset.fname); if (f) f.nombre = t.value.trim() || f.nombre; applyFijosToCurrent(); }
+    else if (t.dataset.fmonto) { const f = state.fijos.find((x) => x.id === t.dataset.fmonto); if (f) f.monto = Math.max(0, parseAmount(t.value)); applyFijosToCurrent(); }
+    else return;
+    save(); render(); toast("Guardado");
+  });
+  ajustes.addEventListener("click", async (e) => {
+    const t = e.target.closest("button"); if (!t) return;
+    if (t.dataset.fdel) {
+      state.fijos = state.fijos.filter((f) => f.id !== t.dataset.fdel);
+      applyFijosToCurrent(); save(); render(); toast("Gasto fijo quitado");
+    } else if (t.id === "addFijo") {
+      const id = "f" + uid();
+      state.fijos.push({ id, nombre: "Nuevo gasto", monto: 0 });
+      applyFijosToCurrent(); save(); render();
+      const inp = document.getElementById("fn-" + id); if (inp) { inp.focus(); inp.select(); }
+    } else if (t.id === "enablePush") {
+      enablePush();
+    } else if (t.id === "testPush") {
+      testPush();
+    } else if (t.id === "copyPush") {
+      const ta = document.getElementById("pushCode");
+      try { await navigator.clipboard.writeText(ta.value); toast("Código copiado"); }
+      catch (err) { ta.select(); toast("Selecciona y copia el código"); }
+    } else if (t.id === "copyBackup") {
+      const text = JSON.stringify(state);
+      try { await navigator.clipboard.writeText(text); toast("Respaldo copiado"); }
+      catch (err) { const ta = document.getElementById("restoreText"); ta.value = text; ta.select(); toast("Selecciona y copia el texto"); }
+    } else if (t.id === "downloadCsv") {
+      const rows = [["fecha", "tipo", "categoria", "monto", "nota"]];
+      for (const [key, m] of Object.entries(state.meses).sort()) for (const mv of m.movs) rows.push([mv.fecha, mv.tipo, mv.tipo === "gasto" ? catName(m, mv.cat) : "", String(mv.monto), mv.nota || ""]);
+      const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" }));
+      a.download = "sol-a-sol-movimientos.csv";
+      document.body.appendChild(a); a.click(); a.remove();
+      toast("CSV listo");
+    } else if (t.id === "restoreBtn") {
+      try {
+        const data = JSON.parse(document.getElementById("restoreText").value);
+        if (!data || data.version !== 1 || !Array.isArray(data.fijos) || typeof data.meses !== "object") throw new Error("formato");
+        state = data; save(); render(); toast("Respaldo restaurado");
+      } catch (err) { toast("Ese texto no es un respaldo válido"); }
+    } else if (t.id === "resetBtn") {
+      if (!t.classList.contains("arm")) { t.classList.add("arm"); t.textContent = "Toca otra vez para borrar"; setTimeout(() => { t.classList.remove("arm"); t.textContent = "Borrar todo"; }, 3000); return; }
+      state = seed(); save(); render(); toast("Datos reiniciados");
+    }
+  });
+
+  render();
+  if (pendingToast) toast(pendingToast);
+
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+  }
+})();
+</script>
+</body>
+</html>

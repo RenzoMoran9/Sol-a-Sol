@@ -1,0 +1,36 @@
+name: Recordatorio de la noche
+
+on:
+  schedule:
+    # 01:50 UTC = 8:50 pm en Lima. GitHub suele demorar unos minutos, así que llega cerca de las 9 pm.
+    - cron: "50 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar dependencias
+        working-directory: recordatorio
+        run: npm install --no-audit --no-fund
+      - name: Enviar aviso al celular
+        working-directory: recordatorio
+        run: node enviar.mjs
+        env:
+          VAPID_PUBLIC_KEY: BEwX7EESkmP3TXC7THZ8xIxZaopBEo3n4N_y-p8T74UsLOw52w917NFBP7uPbT2x5eCuhWjaKjKkdvZMhhjGukE
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
+      # GitHub apaga las tareas programadas tras 60 días sin cambios en el repo; esto lo evita.
+      - name: Mantener activo el recordatorio
+        if: always()
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/recordatorio.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
