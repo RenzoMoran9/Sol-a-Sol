@@ -465,7 +465,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
     const ratio = s.ingresos > 0 ? s.fijosTotal / s.ingresos : 0;
     if (ratio >= 0.7) tips.push({ c: "var(--warn)", t: `Tus gastos fijos se llevan el <b>${Math.round(ratio * 100)}%</b> de lo que entra. Lo sano es que no pasen del 50–60%. Revisa cuál puedes bajar.` });
     if (s.libre < 0) tips.push({ c: "var(--bad)", t: `Este mes vas <b>${money(-s.libre)}</b> por encima de lo que entró. Frena los gustos hasta el próximo ingreso.` });
-    else if (s.ahorro === 0 && s.libre >= state.ahorroMensual) tips.push({ c: "var(--accent)", t: `Págate primero: aparta <b>${money(state.ahorroMensual)}</b> apenas cobres y vive con el resto.` });
+    else if (s.ahorro === 0 && state.ahorroMensual > 0 && s.libre >= state.ahorroMensual) tips.push({ c: "var(--accent)", t: `Págate primero: aparta <b>${money(state.ahorroMensual)}</b> apenas cobres y vive con el resto.` });
     if (s.excesoFijos > 0) tips.push({ c: "var(--bad)", t: `Te pasaste <b>${money(s.excesoFijos)}</b> en tus gastos fijos. Revisa cuáles están en rojo.` });
     if (s.extra > 0) tips.push({ c: "var(--muted)", t: `Llevas <b>${money(s.extra)}</b> en gastos fuera de tu lista fija.` });
 
@@ -530,7 +530,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
         <div class="line"><h2>Fondo de emergencia</h2><b>${money(ahorrado)}</b></div>
         <div class="meter"><i style="width:${goalPct}%"></i></div>
         <p>${meta > 0 ? (faltan > 0 ? `Meta ${money(meta)} (unos 3 meses de tus gastos fijos). Faltan ${money(faltan)}${meses ? `: apartando ${money(state.ahorroMensual)} al mes llegas en ${meses} ${meses === 1 ? "mes" : "meses"}` : ""}.` : "Llegaste a tu meta. Ahora el ahorro puede ir a otro objetivo.") : "Define una meta en Ajustes."}</p>
-        <button class="btn accent" data-save="1">Apartar ${money(state.ahorroMensual)}</button>
+        ${state.ahorroMensual > 0 ? `<button class="btn accent" data-save="1">Apartar ${money(state.ahorroMensual)}</button>` : ""}
       </div>`;
   }
 
