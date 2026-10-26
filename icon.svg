@@ -1,6 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#161b26"/>
-  <circle cx="256" cy="256" r="168" fill="#e3b456"/>
-  <circle cx="256" cy="256" r="146" fill="none" stroke="#1a1406" stroke-opacity="0.25" stroke-width="8"/>
-  <text x="256" y="300" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="128" fill="#1a1406">S/</text>
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1135"/><stop offset="0.7" stop-color="#16205e"/><stop offset="1" stop-color="#2a3486"/></linearGradient>
+    <radialGradient id="sol" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff3b8"/><stop offset="0.45" stop-color="#ffc83d"/><stop offset="1" stop-color="#ff8a1f"/></radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#cielo)"/>
+  <g fill="#fff" opacity="0.8"><circle cx="78" cy="96" r="4"/><circle cx="430" cy="80" r="3"/><circle cx="400" cy="170" r="2.5"/><circle cx="110" cy="190" r="2.5"/><circle cx="250" cy="60" r="3"/></g>
+  <g fill="#ffcf5a">
+    <rect x="248" y="58" width="16" height="44" rx="8"/><rect x="248" y="58" width="16" height="44" rx="8" transform="rotate(45 256 232)"/><rect x="248" y="58" width="16" height="44" rx="8" transform="rotate(90 256 232)"/><rect x="248" y="58" width="16" height="44" rx="8" transform="rotate(-45 256 232)"/><rect x="248" y="58" width="16" height="44" rx="8" transform="rotate(-90 256 232)"/>
+  </g>
+  <circle cx="256" cy="232" r="118" fill="url(#sol)"/>
+  <circle cx="196" cy="262" r="17" fill="#ff6f8a" opacity="0.5"/><circle cx="316" cy="262" r="17" fill="#ff6f8a" opacity="0.5"/>
+  <ellipse cx="220" cy="214" rx="13" ry="17" fill="#5a2a00"/><ellipse cx="292" cy="214" rx="13" ry="17" fill="#5a2a00"/>
+  <path d="M206 262Q256 312 306 262" fill="none" stroke="#5a2a00" stroke-width="13" stroke-linecap="round"/>
+  <path d="M0 430 70 372l64 40 70-66 66 52 74-62 76 58 92-44v162H0z" fill="#1f2868"/>
+  <path d="M0 470l90-40 80 30 90-44 96 40 82-28 74 26v58H0z" fill="#0e143d"/>
+  <rect y="486" width="512" height="26" fill="#e8452c"/>
+  <g fill="#ffb238"><path d="M32 488l14 11-14 11-14-11zM96 488l14 11-14 11-14-11zM160 488l14 11-14 11-14-11zM224 488l14 11-14 11-14-11zM288 488l14 11-14 11-14-11zM352 488l14 11-14 11-14-11zM416 488l14 11-14 11-14-11zM480 488l14 11-14 11-14-11z"/></g>
 </svg>

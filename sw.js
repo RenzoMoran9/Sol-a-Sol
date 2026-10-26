@@ -1,5 +1,5 @@
 // Guarda la app en el celular para que abra sin internet.
-const CACHE = "solasol-v2";
+const CACHE = "solasol-v3";
 const SHELL = ["./", "index.html", "manifest.json", "icon.svg", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (event) => {
