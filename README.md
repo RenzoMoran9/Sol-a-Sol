@@ -2,7 +2,7 @@
 
 App minimalista de finanzas personales: lo libre del mes, gastos fijos, cierre del día con racha y fondo de emergencia. Se instala en el celular y manda un recordatorio cada noche.
 
-**App:** https://renzomoran9.github.io/sol-a-sol/
+**App:** https://renzomoran9.github.io/Sol-a-Sol/
 
 ## Cómo está armada
 

@@ -319,7 +319,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 
   // Llave pública para las notificaciones (la privada vive como secreto en GitHub).
   const VAPID_PUBLIC = "BEwX7EESkmP3TXC7THZ8xIxZaopBEo3n4N_y-p8T74UsLOw52w917NFBP7uPbT2x5eCuhWjaKjKkdvZMhhjGukE";
-  const SECRETS_URL = "https://github.com/RenzoMoran9/sol-a-sol/settings/secrets/actions";
+  const SECRETS_URL = "https://github.com/RenzoMoran9/Sol-a-Sol/settings/secrets/actions";
 
   const fmtInt = new Intl.NumberFormat("es-PE", { maximumFractionDigits: 0 });
   const fmtDec = new Intl.NumberFormat("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -715,7 +715,7 @@ dialog::backdrop { background: rgb(8 10 14 / 0.5); }
 
   function notifHtml() {
     if (isIOS && !isStandalone) return `<p>En iPhone las notificaciones funcionan con la app instalada. Toca <b>Compartir → Agregar a inicio</b>, abre Sol a Sol desde su ícono y vuelve aquí.</p>`;
-    if (!pushSupported) return `<p>Las notificaciones funcionan en la app instalada desde <b>renzomoran9.github.io/sol-a-sol</b>. Ábrela ahí en tu celular para activarlas.</p>`;
+    if (!pushSupported) return `<p>Las notificaciones funcionan en la app instalada desde <b>renzomoran9.github.io/Sol-a-Sol</b>. Ábrela ahí en tu celular para activarlas.</p>`;
     const perm = Notification.permission;
     if (perm === "denied") return `<p class="status warn">Bloqueaste las notificaciones para esta app.</p><p>Actívalas en los ajustes del celular (Notificaciones → Sol a Sol) y vuelve aquí.</p>`;
     if (!state.push) return `<p>Cada noche cerca de las 9 pm te llega un aviso para hacer el cierre del día.</p><button class="btn accent" id="enablePush">Activar notificaciones</button>`;

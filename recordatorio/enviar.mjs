@@ -19,7 +19,7 @@ const mensajes = [
 ];
 const body = mensajes[new Date().getUTCDate() % mensajes.length];
 
-webpush.setVapidDetails(APP_URL || "https://renzomoran9.github.io/sol-a-sol/", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+webpush.setVapidDetails(APP_URL || "https://renzomoran9.github.io/Sol-a-Sol/", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 try {
   const res = await webpush.sendNotification(
