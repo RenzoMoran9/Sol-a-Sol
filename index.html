@@ -1395,7 +1395,9 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
     const today = todayISO();
     const m = monthView(monthKeyOf(today));
     const movs = m.movs.filter((x) => x.fecha === today).sort((a, b) => b.id.localeCompare(a.id));
-    const gastos = movs.filter((x) => x.tipo === "gasto").reduce((a, x) => a + x.monto, 0);
+    // El total del día no suma los pagos de gastos fijos: esos van aparte.
+    const fijoIds = new Set(m.presupuesto.map((p) => p.id));
+    const gastos = movs.filter((x) => x.tipo === "gasto" && !fijoIds.has(x.cat)).reduce((a, x) => a + x.monto, 0);
     const closed = !!state.cierres[today];
     const n = streak();
     const [y, mo, d] = today.split("-").map(Number);
@@ -1410,7 +1412,6 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
       week.push(`<div class="${c === true ? "on" : c ? "prot" : ""}${iso === today ? " today" : ""}"><i>${c === true ? icon("llama") : c ? icon("escudo") : ""}</i>${esc(label)}</div>`);
     }
 
-    const cats = [...m.presupuesto, ...EXTRA_CATS];
     const rows = movs.map((mv) => {
       const cls = mv.tipo === "ingreso" ? " in" : mv.tipo === "ahorro" ? " save" : "";
       const sign = mv.tipo === "gasto" || mv.tipo === "deuda" ? "−" : "+";
@@ -1432,8 +1433,8 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
 
       <div class="section">
         <div class="section-head"><h2>¿Qué gastaste hoy?</h2><span class="num">${money(gastos)} · ${esc(fecha)}</span></div>
-        <div class="chips">${cats.map((c) => `<button class="chip" data-quick="${esc(c.id)}">${esc(c.nombre)}</button>`).join("")}</div>
-        ${movs.length ? `<div class="list">${rows}</div>` : `<div class="empty">Toca una categoría para anotar un gasto de hoy. Piensa en lo que pagaste en efectivo, Yape o tarjeta.</div>`}
+        <div class="chips">${EXTRA_CATS.map((c) => `<button class="chip" data-quick="${esc(c.id)}">${esc(c.nombre)}</button>`).join("")}</div>
+        ${movs.length ? `<div class="list">${rows}</div>` : `<div class="empty">Toca una categoría para anotar un gasto de hoy. Piensa en lo que pagaste en efectivo, Yape o tarjeta. Tus gastos fijos van aparte: se pagan con su botón Pagar en Mi mes.</div>`}
       </div>
 
       ${closed
@@ -1725,10 +1726,11 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
 
   /* ---------- Hoja de registro ---------- */
   const sheet = document.getElementById("sheet");
-  let sheetTipo = "gasto", sheetSel = null;
+  let sheetTipo = "gasto", sheetSel = null, sheetFijo = false;
 
+  // Los gastos fijos van aparte: solo se eligen al pagarlos con su botón Pagar. Lo del día va a gustos, imprevistos u otros.
   function sheetOptions(t) {
-    if (t === "gasto") { const m = monthView(current); return [...m.presupuesto, ...EXTRA_CATS]; }
+    if (t === "gasto") return sheetFijo ? monthView(current).presupuesto : EXTRA_CATS;
     if (t === "ahorro") return state.metas;
     if (t === "deuda") return state.deudas.filter((d) => d.saldo > 0.005);
     return [];
@@ -1752,6 +1754,7 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
   function openSheet(opts = {}) {
     document.querySelector('[data-tipo="deuda"]').hidden = !state.deudas.some((d) => d.saldo > 0.005);
     sheetSel = opts.sel || null;
+    sheetFijo = !!opts.fijo;
     setTipo(opts.tipo || "gasto", opts.titulo);
     document.getElementById("movMonto").value = opts.monto ? String(round2(opts.monto)) : "";
     document.getElementById("movNota").value = opts.nota || "";
@@ -1777,7 +1780,7 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
     const rest = round2(p.monto - (summary(m, current).spentBy[p.id] || 0));
     if (rest <= 0) return;
     openSheet({
-      tipo: "gasto", sel: p.id, monto: rest, nota: "Pago del mes", titulo: `Pagar ${p.nombre}`,
+      tipo: "gasto", fijo: true, sel: p.id, monto: rest, nota: "Pago del mes", titulo: `Pagar ${p.nombre}`,
       hint: `Faltan ${money(rest)}. Si vas a pagar solo una parte, cambia el monto.`,
       quick: [{ label: `Todo ${money(rest)}`, monto: rest }, { label: `Mitad ${money(rest / 2)}`, monto: round2(rest / 2) }]
     });
@@ -1812,7 +1815,7 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
   document.getElementById("fab").addEventListener("click", () => openSheet());
   document.getElementById("closeSheet").addEventListener("click", closeSheet);
   sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSheet(); });
-  document.querySelector(".seg").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) { sheetSel = null; setTipo(b.dataset.tipo); } });
+  document.querySelector(".seg").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) { sheetSel = null; sheetFijo = false; setTipo(b.dataset.tipo); } });
   document.getElementById("movCats").addEventListener("click", (e) => {
     const b = e.target.closest("[data-cat]"); if (!b) return;
     sheetSel = b.dataset.cat;
