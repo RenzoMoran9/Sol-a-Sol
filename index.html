@@ -129,6 +129,7 @@ button { cursor: pointer; }
 .sky .big { color: #fff; text-shadow: 0 2px 14px rgb(0 0 0 / 0.2); }
 .sky .big small { color: rgb(255 255 255 / 0.78); }
 .sky .big.neg { color: #ffd3da; }
+.sky-edit { border: 0; background: none; padding: 0; color: #fff; font: inherit; letter-spacing: inherit; text-transform: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .sky-foot { position: relative; height: 74px; margin-top: 2px; }
 .sky-foot > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .sky-foot p { position: absolute; left: 18px; right: 18px; bottom: 14px; margin: 0; display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; color: rgb(255 255 255 / 0.92); }
@@ -1115,8 +1116,10 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
     const ahorroComp = Math.max(ahorro, past ? 0 : ahorroPlan);
     const deudaComp = Math.max(deudaPagado, deudaPlan);
     const ingresos = m.ingreso + ingresosExtra;
-    const libre = ingresos - comprometido - extra - ahorroComp - deudaComp;
-    return { spentBy, ingresos, ingresosExtra, ahorro, gastado, deudaPagado, deudaPlan, deudaComp, ahorroPlan, ahorroComp, fijosTotal, fijosPagado, fijosPendiente: fijosTotal - fijosPagado, excesoFijos, extra, libre };
+    // ajuste: lo que la persona corrigió a mano para que "libre" cuadre con lo que de verdad tiene.
+    const ajuste = m.ajuste || 0;
+    const libre = ingresos - comprometido - extra - ahorroComp - deudaComp + ajuste;
+    return { ajuste, spentBy, ingresos, ingresosExtra, ahorro, gastado, deudaPagado, deudaPlan, deudaComp, ahorroPlan, ahorroComp, fijosTotal, fijosPagado, fijosPendiente: fijosTotal - fijosPagado, excesoFijos, extra, libre };
   }
 
   function sugeridoAhorro(key) {
@@ -1322,7 +1325,7 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
           <span class="arc-end l">1 ${esc(mesCorto)}</span>
           <span class="arc-end r">${diasMes} ${esc(mesCorto)}</span>
           <div class="arc-center">
-            <p class="eyebrow">Libre para gastar</p>
+            <p class="eyebrow">Libre para gastar · <button class="sky-edit" data-act="editLibre">Cambiar</button></p>
             <p class="big${s.libre < 0 ? " neg" : ""}"><small>S/</small><span id="libreNum">${s.libre < 0 ? "−" : ""}${fmt.format(Math.abs(s.libre))}</span></p>
           </div>
         </div>
@@ -1338,7 +1341,7 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
       </section>
 
       <div class="split">
-        <p class="sub">Entraron <b class="num">${money(s.ingresos)}</b> · fijos <b class="num">${money(s.fijosTotal)}</b>${s.deudaComp ? ` · deudas <b class="num">${money(s.deudaComp)}</b>` : ""}${s.ahorroComp ? ` · ahorro <b class="num">${money(s.ahorroComp)}</b>` : ""}</p>
+        <p class="sub">Entraron <b class="num">${money(s.ingresos)}</b> · fijos <b class="num">${money(s.fijosTotal)}</b>${s.deudaComp ? ` · deudas <b class="num">${money(s.deudaComp)}</b>` : ""}${s.ahorroComp ? ` · ahorro <b class="num">${money(s.ahorroComp)}</b>` : ""}${s.ajuste ? ` · ajuste tuyo <b class="num">${s.ajuste > 0 ? "+" : ""}${money(s.ajuste)}</b>` : ""}</p>
         <div class="stack" role="img" aria-label="Reparto del ingreso del mes">
           <i style="width:${pct(s.fijosPagado + s.deudaPagado)}%;background:var(--bar-paid)"></i>
           <i style="width:${pct(s.fijosPendiente + s.excesoFijos + s.deudaComp - s.deudaPagado)}%;background:var(--bar-pending)"></i>
@@ -1861,7 +1864,14 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
   function openEditor(kind, id) {
     edKind = kind; edId = id || null;
     let html = "";
-    if (kind === "meta") {
+    if (kind === "libre") {
+      const m = monthView(current);
+      const s = summary(m, current);
+      const pend = round2(s.fijosPendiente + Math.max(0, s.ahorroComp - s.ahorro) + Math.max(0, s.deudaComp - s.deudaPagado));
+      document.getElementById("edTitle").textContent = "¿Cuánto te queda?";
+      html = `${moneyField("edLibre", "Lo que tienes libre ahora", round2(s.libre))}
+        <p class="hint" style="margin:0">Pon lo que de verdad tienes y desde ahí se irán descontando tus gastos del día.${pend > 0 ? ` Ojo: la app ya te aparta ${money(pend)} que aún te faltan pagar o ahorrar este mes. Si lo que tienes en tu cuenta incluye esa plata, réstala antes.` : ""}</p>`;
+    } else if (kind === "meta") {
       const x = state.metas.find((v) => v.id === id) || { nombre: "", objetivo: 0, fecha: "", base: 0 };
       document.getElementById("edTitle").textContent = id ? "Editar meta" : "Nueva meta";
       html = `<div class="field"><label for="edNombre">Nombre</label><input class="input" id="edNombre" maxlength="40" placeholder="Ej.: Viaje a Cusco" value="${esc(x.nombre)}" /></div>
@@ -1879,7 +1889,9 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
     document.getElementById("edFields").innerHTML = html;
     document.getElementById("edError").hidden = true;
     const del = document.getElementById("edDelete");
-    del.hidden = !id; del.classList.remove("arm"); del.textContent = "Eliminar";
+    const delText = kind === "libre" ? "Volver al cálculo de la app" : "Eliminar";
+    del.hidden = kind === "libre" ? !monthView(current).ajuste : !id;
+    del.classList.remove("arm"); del.textContent = delText;
     if (typeof editor.showModal === "function") editor.showModal(); else editor.setAttribute("open", "");
   }
   function closeEditor() { if (editor.open) editor.close ? editor.close() : editor.removeAttribute("open"); }
@@ -1889,6 +1901,16 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
   document.getElementById("edForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const err = (msg) => { const el = document.getElementById("edError"); el.textContent = msg; el.hidden = false; };
+    if (edKind === "libre") {
+      const campo = document.getElementById("edLibre").value.trim();
+      if (!campo) return err("Escribe cuánto te queda.");
+      const m = getMonth(current, true);
+      const s = summary(m, current);
+      m.ajuste = round2(s.ajuste + parseAmount(campo) - s.libre);
+      if (!m.ajuste) delete m.ajuste;
+      save(); closeEditor(); render(); toast("Listo, desde aquí se descuenta");
+      return;
+    }
     const nombre = document.getElementById("edNombre").value.trim();
     if (!nombre) return err("Ponle un nombre.");
     if (edKind === "meta") {
@@ -1906,7 +1928,8 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
   });
   document.getElementById("edDelete").addEventListener("click", (e) => {
     const b = e.currentTarget;
-    if (!b.classList.contains("arm")) { b.classList.add("arm"); b.textContent = "Toca otra vez para eliminar"; return; }
+    if (!b.classList.contains("arm")) { b.classList.add("arm"); b.textContent = edKind === "libre" ? "Toca otra vez para confirmar" : "Toca otra vez para eliminar"; return; }
+    if (edKind === "libre") { const m = getMonth(current, false); if (m) delete m.ajuste; save(); closeEditor(); render(); toast("Volviste al cálculo de la app"); return; }
     if (edKind === "meta") state.metas = state.metas.filter((v) => v.id !== edId);
     else state.deudas = state.deudas.filter((v) => v.id !== edId);
     save(); closeEditor(); render(); toast("Eliminado");
@@ -1962,6 +1985,7 @@ dialog::backdrop { background: rgb(6 9 30 / 0.55); }
       if (!state.metas.some(esFondo)) state.metas.unshift({ id: "fondo", nombre: "Fondo de emergencia", objetivo: round2(fijos * 3), fecha: "", base: 0 });
       save(); goView("plan"); toast("Meta creada");
     }
+    else if (d.act === "editLibre") openEditor("libre");
     else if (d.act === "noName") { state.nombre = ""; save(); render(); }
     else if (d.act === "usarSugerido") { getMonth(current, true).ahorroPlan = sugeridoAhorro(current); save(); render(); toast("Plan de ahorro actualizado"); }
   });
